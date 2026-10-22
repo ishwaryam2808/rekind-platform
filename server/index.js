@@ -17,6 +17,11 @@ app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
+// Cloud Health Check Endpoint
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // Auth Middleware
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
