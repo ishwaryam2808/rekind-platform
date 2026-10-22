@@ -1,0 +1,23 @@
+{
+  "name": "rekind-platform",
+  "version": "1.0.0",
+  "description": "REKIND — Give Things a Second Life. Modern community reuse platform.",
+  "scripts": {
+    "start": "node server/index.js",
+    "build": "cd client && npm run build",
+    "dev:server": "cd server && node index.js",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "sustainability",
+    "reuse",
+    "community",
+    "donation",
+    "lending",
+    "exchange",
+    "second-hand"
+  ],
+  "author": "REKIND Team",
+  "license": "MIT"
+}

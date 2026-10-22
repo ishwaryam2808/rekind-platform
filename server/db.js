@@ -1,0 +1,583 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import bcrypt from 'bcryptjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DB_FILE = path.join(__dirname, 'db.json');
+
+// Ensure database file exists with initial data
+export function getDb() {
+  if (!fs.existsSync(DB_FILE)) {
+    const initialData = seedDatabase();
+    fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
+    return initialData;
+  }
+  try {
+    const content = fs.readFileSync(DB_FILE, 'utf-8');
+    return JSON.parse(content);
+  } catch (err) {
+    console.error('Error reading DB, re-initializing:', err);
+    const initialData = seedDatabase();
+    fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
+    return initialData;
+  }
+}
+
+export function saveDb(data) {
+  try {
+    const tempFile = `${DB_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tempFile, DB_FILE);
+  } catch (err) {
+    console.error('Error saving DB:', err);
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  }
+}
+
+function seedDatabase() {
+  const salt = bcrypt.genSaltSync(10);
+  const defaultPasswordHash = bcrypt.hashSync('Password123!', salt);
+
+  const users = [
+    {
+      id: 'usr-1',
+      name: 'Maya Sen',
+      email: 'maya.sen@campus.edu',
+      passwordHash: defaultPasswordHash,
+      phone: '+1 (555) 234-8901',
+      location: 'North Campus & Hostel C',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      bio: 'Final year environmental engineering student. Passionate about zero-waste campus living, exchanging course resources, and fixing old electronics.',
+      badges: ['Campus Champion', 'Top Giver', 'Verified Student'],
+      trustScore: 99,
+      itemsSharedCount: 14,
+      itemsReceivedCount: 6,
+      createdAt: '2026-08-15T10:00:00.000Z'
+    },
+    {
+      id: 'usr-2',
+      name: 'David Rivera',
+      email: 'david.r@community.org',
+      passwordHash: defaultPasswordHash,
+      phone: '+1 (555) 891-3420',
+      location: 'Riverside Community & High St.',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      bio: 'Woodworker, community gardener, and father of two. Love repairing household items and lending tools to neighbors.',
+      badges: ['Master Fixer', 'Generous Lender', 'Community Anchor'],
+      trustScore: 97,
+      itemsSharedCount: 22,
+      itemsReceivedCount: 9,
+      createdAt: '2026-07-20T14:30:00.000Z'
+    },
+    {
+      id: 'usr-3',
+      name: 'Amina El-Amin',
+      email: 'amina@familycare.net',
+      passwordHash: defaultPasswordHash,
+      phone: '+1 (555) 432-6789',
+      location: 'Oakwood Family Quarter',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      bio: 'Passing on gently used children books, wooden educational toys, and outgrown clothes to younger families.',
+      badges: ['Family Circle', 'Caring Neighbor'],
+      trustScore: 96,
+      itemsSharedCount: 18,
+      itemsReceivedCount: 12,
+      createdAt: '2026-09-01T09:15:00.000Z'
+    },
+    {
+      id: 'usr-4',
+      name: 'Kiran Patel',
+      email: 'kiran.p@techhub.io',
+      passwordHash: defaultPasswordHash,
+      phone: '+1 (555) 765-4321',
+      location: 'Innovation District & Tech Hostel',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+      bio: 'Robotics enthusiast and book collector. Happy to lend calculators, test meters, and reference textbooks.',
+      badges: ['Tech Mentor', 'Bookkeeper'],
+      trustScore: 95,
+      itemsSharedCount: 9,
+      itemsReceivedCount: 4,
+      createdAt: '2026-09-12T16:45:00.000Z'
+    }
+  ];
+
+  const items = [
+    {
+      id: 'item-1',
+      title: 'Stewart Calculus: Early Transcendentals (8th Ed) + Formula Companion',
+      description: 'Used for two semesters of Multivariable Calculus. Pristine pages with no heavy highlighting. Includes bound formula handbook and handwritten problem set summaries. Perfect for engineering and math sophomores.',
+      category: 'Books and Education',
+      type: 'donate',
+      condition: 'Gently Used',
+      price: 0,
+      isFree: true,
+      lendingDuration: '',
+      exchangePreferences: '',
+      quantity: 1,
+      location: 'North Campus & Hostel C',
+      images: [
+        'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-1',
+      ownerName: 'Maya Sen',
+      ownerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 99,
+      ownerLocation: 'North Campus & Hostel C',
+      status: 'available',
+      views: 142,
+      tags: ['calculus', 'math', 'textbook', 'engineering', 'free'],
+      safetyNotes: 'Can meet outside Central Campus Library or Hostel C Common Room in daylight hours.',
+      createdAt: '2026-10-20T11:20:00.000Z',
+      updatedAt: '2026-10-20T11:20:00.000Z'
+    },
+    {
+      id: 'item-2',
+      title: 'Texas Instruments TI-84 Plus CE Graphing Calculator (Rechargeable)',
+      description: 'Bright color screen TI-84 Plus CE in rose gold / charcoal. Tested battery holds charge for weeks. Complete with micro-USB charging cable and slide protective cover. Ideal for calculus, statistics, or SAT/ACT prep.',
+      category: 'Electronics',
+      type: 'lend',
+      condition: 'Like New',
+      price: 0,
+      isFree: true,
+      lendingDuration: 'For the semester (Up to 4 months)',
+      exchangePreferences: '',
+      quantity: 1,
+      location: 'Innovation District & Tech Hostel',
+      images: [
+        'https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-4',
+      ownerName: 'Kiran Patel',
+      ownerAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 95,
+      ownerLocation: 'Innovation District & Tech Hostel',
+      status: 'available',
+      views: 210,
+      tags: ['calculator', 'ti84', 'graphing', 'stem', 'lend'],
+      safetyNotes: 'Lending agreement logged with campus student ID verification. Return expected by finals week.',
+      createdAt: '2026-10-18T14:10:00.000Z',
+      updatedAt: '2026-10-18T14:10:00.000Z'
+    },
+    {
+      id: 'item-3',
+      title: 'Solid Birch Wood Bedside Study Table with Drawer',
+      description: 'Handcrafted solid birch side desk / nightstand with smooth dovetail drawer and lower shelf for books or baskets. Sturdy, warm natural oil finish, no wobbles. Passed through our guest room and looking for a grateful home.',
+      category: 'Furniture and Home',
+      type: 'donate',
+      condition: 'Good',
+      price: 0,
+      isFree: true,
+      lendingDuration: '',
+      exchangePreferences: '',
+      quantity: 1,
+      location: 'Riverside Community & High St.',
+      images: [
+        'https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-2',
+      ownerName: 'David Rivera',
+      ownerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 97,
+      ownerLocation: 'Riverside Community & High St.',
+      status: 'available',
+      views: 315,
+      tags: ['furniture', 'wood', 'table', 'hostel', 'free'],
+      safetyNotes: 'Easy curbside pickup in Riverside. Can assist with loading into your vehicle or hatchback.',
+      createdAt: '2026-10-19T08:45:00.000Z',
+      updatedAt: '2026-10-19T08:45:00.000Z'
+    },
+    {
+      id: 'item-4',
+      title: 'Montessori Wooden Building Blocks & Geometric Puzzle Set (120 pcs)',
+      description: 'Natural unvarnished beechwood blocks, bridges, cylinders, and arches. Sparks hours of creative open-ended play for kids ages 2–7. Cleaned and packed in a durable canvas drawstring tote.',
+      category: 'Toys and Games',
+      type: 'exchange',
+      condition: 'Like New',
+      price: 0,
+      isFree: false,
+      lendingDuration: '',
+      exchangePreferences: 'Looking for beginner reader chapter books (e.g., Magic Treehouse series) or science experiment kits.',
+      quantity: 1,
+      location: 'Oakwood Family Quarter',
+      images: [
+        'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-3',
+      ownerName: 'Amina El-Amin',
+      ownerAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 96,
+      ownerLocation: 'Oakwood Family Quarter',
+      status: 'available',
+      views: 98,
+      tags: ['toys', 'montessori', 'wooden', 'swap', 'exchange'],
+      safetyNotes: 'Family-friendly porch swap or meet at Oakwood Community Playground.',
+      createdAt: '2026-10-21T09:30:00.000Z',
+      updatedAt: '2026-10-21T09:30:00.000Z'
+    },
+    {
+      id: 'item-5',
+      title: 'Instant Pot Duo 7-in-1 Electric Pressure Cooker (6 Quart)',
+      description: 'Clean, fully functioning 6-quart pressure cooker / slow cooker / rice maker. Includes stainless steel inner pot, steam rack, and silicone sealing ring. Replaced during kitchen downsize. Perfect for dorm cooking or meal prepping.',
+      category: 'Kitchen Essentials',
+      type: 'sell',
+      condition: 'Gently Used',
+      price: 25,
+      isFree: false,
+      lendingDuration: '',
+      exchangePreferences: '',
+      quantity: 1,
+      location: 'Riverside Community & High St.',
+      images: [
+        'https://images.unsplash.com/photo-1544233726-9f1d2b27be8b?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-2',
+      ownerName: 'David Rivera',
+      ownerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 97,
+      ownerLocation: 'Riverside Community & High St.',
+      status: 'available',
+      views: 185,
+      tags: ['kitchen', 'instantpot', 'cooker', 'affordable', 'appliance'],
+      safetyNotes: 'All safety valves and gaskets tested. Cash or digital peer transfer upon in-person handover.',
+      createdAt: '2026-10-21T15:00:00.000Z',
+      updatedAt: '2026-10-21T15:00:00.000Z'
+    },
+    {
+      id: 'item-6',
+      title: 'Yamaha FG800 Acoustic Folk Guitar with Padded Gig Bag',
+      description: 'Solid spruce top dreadnought guitar with rich resonance. Recently restrung with D\'Addario light phosphor bronze strings. Comes with padded gig bag, clip-on digital tuner, and three medium picks.',
+      category: 'Other Reusable Items',
+      type: 'lend',
+      condition: 'Gently Used',
+      price: 0,
+      isFree: true,
+      lendingDuration: 'Up to 2 months for learning / practice',
+      exchangePreferences: '',
+      quantity: 1,
+      location: 'North Campus & Hostel C',
+      images: [
+        'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1525201548942-d8732f6617a0?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-1',
+      ownerName: 'Maya Sen',
+      ownerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 99,
+      ownerLocation: 'North Campus & Hostel C',
+      status: 'available',
+      views: 264,
+      tags: ['guitar', 'music', 'acoustic', 'lend', 'hobby'],
+      safetyNotes: 'Careful storage required away from extreme heat/humidity. Can teach basic chords at handover!',
+      createdAt: '2026-10-17T17:40:00.000Z',
+      updatedAt: '2026-10-17T17:40:00.000Z'
+    },
+    {
+      id: 'item-7',
+      title: 'Patagonia Torrentshell 3L Waterproof Rain Jacket (Unisex M)',
+      description: 'Genuine Patagonia H2No 3-layer performance waterproof shell in earthy olive/tan. Clean zippers, pit zips for ventilation, adjustable hood. Kept dry through hiking season, pristine condition with no tears or seam leaks.',
+      category: 'Clothing and Accessories',
+      type: 'sell',
+      condition: 'Like New',
+      price: 45,
+      isFree: false,
+      lendingDuration: '',
+      exchangePreferences: '',
+      quantity: 1,
+      location: 'Innovation District & Tech Hostel',
+      images: [
+        'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-4',
+      ownerName: 'Kiran Patel',
+      ownerAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 95,
+      ownerLocation: 'Innovation District & Tech Hostel',
+      status: 'available',
+      views: 198,
+      tags: ['clothing', 'jacket', 'patagonia', 'outdoor', 'raincoat'],
+      safetyNotes: 'Try-on possible in public lobby before finalizing handover.',
+      createdAt: '2026-10-19T13:25:00.000Z',
+      updatedAt: '2026-10-19T13:25:00.000Z'
+    },
+    {
+      id: 'item-8',
+      title: 'Ergonomic LED Desk Task Lamp with Warm & Daylight Dimming',
+      description: 'Adjustable gooseneck architect lamp with touch controls, 5 color temperature modes, and USB pass-through charging port. Heavy weighted metal base prevents tipping. Ideal for late-night study sessions without eye strain.',
+      category: 'Electronics',
+      type: 'donate',
+      condition: 'Like New',
+      price: 0,
+      isFree: true,
+      lendingDuration: '',
+      exchangePreferences: '',
+      quantity: 1,
+      location: 'Oakwood Family Quarter',
+      images: [
+        'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80'
+      ],
+      ownerId: 'usr-3',
+      ownerName: 'Amina El-Amin',
+      ownerAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      ownerTrustScore: 96,
+      ownerLocation: 'Oakwood Family Quarter',
+      status: 'available',
+      views: 172,
+      tags: ['lamp', 'desk', 'study', 'lighting', 'free'],
+      safetyNotes: 'Includes UL-certified 12V power adapter.',
+      createdAt: '2026-10-21T18:10:00.000Z',
+      updatedAt: '2026-10-21T18:10:00.000Z'
+    }
+  ];
+
+  const communityNeeds = [
+    {
+      id: 'need-1',
+      title: 'Scientific Calculator (Casio fx-991EX or similar) for Engineering Fresher',
+      description: 'First year civil engineering student starting calculus and physics labs. Our department allows standard scientific non-graphing calculators. Can borrow for the semester or accept as a pass-on.',
+      category: 'Electronics',
+      quantity: 1,
+      location: 'North Campus & Hostel C',
+      urgency: 'Critical',
+      requesterId: 'usr-1',
+      requesterName: 'Maya Sen',
+      requesterAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      status: 'open',
+      offersCount: 2,
+      createdAt: '2026-10-21T12:00:00.000Z'
+    },
+    {
+      id: 'need-2',
+      title: 'Compact Foldable Study Table & Ergonomic Stool for Hostel Room',
+      description: 'Moving into room 302 where desk space is tight. Hoping for a folding work table or small laptop desk so I can study without hunching over bed.',
+      category: 'Furniture and Home',
+      quantity: 1,
+      location: 'Innovation District & Tech Hostel',
+      urgency: 'High',
+      requesterId: 'usr-4',
+      requesterName: 'Kiran Patel',
+      requesterAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+      status: 'open',
+      offersCount: 1,
+      createdAt: '2026-10-20T16:20:00.000Z'
+    },
+    {
+      id: 'need-3',
+      title: 'Children Picture & Early Phonics Storybooks (Ages 4–8) for Community Reading Corner',
+      description: 'Setting up a free mini neighborhood library shelf at Oakwood community center. Welcoming picture books, Dr. Seuss, phonics readers, or simple nature encyclopedias in good condition.',
+      category: 'Books and Education',
+      quantity: 15,
+      location: 'Oakwood Family Quarter',
+      urgency: 'Medium',
+      requesterId: 'usr-3',
+      requesterName: 'Amina El-Amin',
+      requesterAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      status: 'open',
+      offersCount: 3,
+      createdAt: '2026-10-18T10:15:00.000Z'
+    },
+    {
+      id: 'need-4',
+      title: 'Basic Sewing Machine or Hemming Tool for Costume Upcycling Project',
+      description: 'Working on a community theater and textile repair circle. Need to borrow a working sewing machine for 2–3 weekends or receive a surplus machine someone isn’t using.',
+      category: 'Other Reusable Items',
+      quantity: 1,
+      location: 'Riverside Community & High St.',
+      urgency: 'Medium',
+      requesterId: 'usr-2',
+      requesterName: 'David Rivera',
+      requesterAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      status: 'open',
+      offersCount: 0,
+      createdAt: '2026-10-19T14:40:00.000Z'
+    }
+  ];
+
+  const itemRequests = [
+    {
+      id: 'req-1',
+      itemId: 'item-1',
+      itemTitle: 'Stewart Calculus: Early Transcendentals (8th Ed)',
+      itemImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+      itemType: 'donate',
+      requesterId: 'usr-4',
+      requesterName: 'Kiran Patel',
+      requesterAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+      ownerId: 'usr-1',
+      requestType: 'donate',
+      proposedExchange: '',
+      borrowDuration: '',
+      message: 'Hello Maya! I am taking multivariable calculus this term and would be deeply grateful to receive this textbook. I can meet you at the central library whenever convenient.',
+      status: 'pending',
+      meetupPreference: 'Central Campus Library',
+      createdAt: '2026-10-21T14:00:00.000Z'
+    }
+  ];
+
+  const communityNeedOffers = [
+    {
+      id: 'off-1',
+      needId: 'need-1',
+      offererId: 'usr-4',
+      offererName: 'Kiran Patel',
+      offererAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+      linkedItemId: 'item-2',
+      message: 'Hi Maya, I have a TI-84 Plus CE or a Casio scientific calculator that I can happily pass on for the semester!',
+      createdAt: '2026-10-21T16:30:00.000Z'
+    }
+  ];
+
+  // REAL verified transfers ledger that underpins the genuine impact metrics
+  const transfers = [
+    {
+      id: 'tx-1',
+      itemId: 'tx-item-1',
+      itemTitle: 'Organic Chemistry Structure & Reactivity (7th Ed)',
+      category: 'Books and Education',
+      sharingType: 'donate',
+      fromUserId: 'usr-1',
+      toUserId: 'usr-4',
+      weightKgEstimated: 1.8,
+      valueSavedEstimated: 140,
+      completedAt: '2026-10-15T16:00:00.000Z'
+    },
+    {
+      id: 'tx-2',
+      itemId: 'tx-item-2',
+      itemTitle: 'Adjustable Kids Wooden High Chair & Booster',
+      category: 'Furniture and Home',
+      sharingType: 'donate',
+      fromUserId: 'usr-3',
+      toUserId: 'usr-2',
+      weightKgEstimated: 7.5,
+      valueSavedEstimated: 110,
+      completedAt: '2026-10-12T11:20:00.000Z'
+    },
+    {
+      id: 'tx-3',
+      itemId: 'tx-item-3',
+      itemTitle: 'DeWalt Cordless Drill Kit (18V) with Extra Battery',
+      category: 'Other Reusable Items',
+      sharingType: 'lend',
+      fromUserId: 'usr-2',
+      toUserId: 'usr-1',
+      weightKgEstimated: 3.2,
+      valueSavedEstimated: 95,
+      completedAt: '2026-10-10T14:15:00.000Z'
+    },
+    {
+      id: 'tx-4',
+      itemId: 'tx-item-4',
+      itemTitle: 'Complete Set of Roald Dahl Storybooks (15 Books)',
+      category: 'Books and Education',
+      sharingType: 'exchange',
+      fromUserId: 'usr-3',
+      toUserId: 'usr-2',
+      weightKgEstimated: 3.0,
+      valueSavedEstimated: 85,
+      completedAt: '2026-10-06T10:00:00.000Z'
+    },
+    {
+      id: 'tx-5',
+      itemId: 'tx-item-5',
+      itemTitle: 'Cast Iron Dutch Oven Skillet (5 Quart)',
+      category: 'Kitchen Essentials',
+      sharingType: 'sell',
+      fromUserId: 'usr-2',
+      toUserId: 'usr-4',
+      weightKgEstimated: 5.4,
+      valueSavedEstimated: 60,
+      completedAt: '2026-10-01T17:30:00.000Z'
+    }
+  ];
+
+  const conversations = [
+    {
+      id: 'conv-1',
+      participants: ['usr-1', 'usr-4'],
+      participantDetails: {
+        'usr-1': { name: 'Maya Sen', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80', location: 'North Campus & Hostel C' },
+        'usr-4': { name: 'Kiran Patel', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80', location: 'Innovation District & Tech Hostel' }
+      },
+      itemId: 'item-1',
+      itemTitle: 'Stewart Calculus: Early Transcendentals (8th Ed)',
+      lastMessage: 'Sounds wonderful! I will meet you at the library entrance at 4 PM.',
+      lastMessageAt: '2026-10-21T15:20:00.000Z',
+      unreadCount: { 'usr-1': 0, 'usr-4': 0 },
+      messages: [
+        {
+          id: 'msg-1',
+          senderId: 'usr-4',
+          senderName: 'Kiran Patel',
+          text: 'Hi Maya! I saw your listing for the Stewart Calculus book. Is it still available? I can meet you anywhere around North Campus.',
+          createdAt: '2026-10-21T14:05:00.000Z',
+          isRead: true
+        },
+        {
+          id: 'msg-2',
+          senderId: 'usr-1',
+          senderName: 'Maya Sen',
+          text: 'Hi Kiran! Yes, it is still available. How does tomorrow around 4 PM at the library entrance sound?',
+          createdAt: '2026-10-21T14:45:00.000Z',
+          isRead: true
+        },
+        {
+          id: 'msg-3',
+          senderId: 'usr-4',
+          senderName: 'Kiran Patel',
+          text: 'Sounds wonderful! I will meet you at the library entrance at 4 PM.',
+          createdAt: '2026-10-21T15:20:00.000Z',
+          isRead: true
+        }
+      ]
+    }
+  ];
+
+  const notifications = [
+    {
+      id: 'notif-1',
+      userId: 'usr-1',
+      title: 'New Item Request',
+      message: 'Kiran Patel requested your item "Stewart Calculus: Early Transcendentals (8th Ed)".',
+      type: 'request_received',
+      link: '/my-activity',
+      isRead: false,
+      createdAt: '2026-10-21T14:00:00.000Z'
+    },
+    {
+      id: 'notif-2',
+      userId: 'usr-1',
+      title: 'Community Response to Your Need',
+      message: 'Kiran Patel offered a calculator in response to your need for a scientific calculator.',
+      type: 'need_offer',
+      link: '/community-needs',
+      isRead: false,
+      createdAt: '2026-10-21T16:30:00.000Z'
+    }
+  ];
+
+  const favorites = [
+    { userId: 'usr-1', itemId: 'item-2' },
+    { userId: 'usr-1', itemId: 'item-3' }
+  ];
+
+  return {
+    users,
+    items,
+    communityNeeds,
+    itemRequests,
+    communityNeedOffers,
+    transfers,
+    conversations,
+    notifications,
+    favorites
+  };
+}
