@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
 import type { SharingType, ItemCondition } from '../types';
 
 const CATEGORIES = [
@@ -62,9 +63,11 @@ export const PostItem: React.FC = () => {
   const [tags, setTags] = useState<string>('');
 
   // Sharing Method & Dynamic Fields
+  const { currency: globalCurrency } = useCurrency();
   const initialMethod = (searchParams.get('method') as SharingType) || 'donate';
   const [type, setType] = useState<SharingType>(initialMethod);
-  const [price, setPrice] = useState<number>(10);
+  const [itemCurrency, setItemCurrency] = useState<'INR' | 'USD'>(globalCurrency);
+  const [price, setPrice] = useState<number>(globalCurrency === 'INR' ? 150 : 10);
   const [lendingDuration, setLendingDuration] = useState<string>('');
   const [exchangePreferences, setExchangePreferences] = useState<string>('');
 
@@ -149,6 +152,7 @@ export const PostItem: React.FC = () => {
         condition,
         type,
         price: type === 'sell' ? Number(price) : 0,
+        currency: type === 'sell' ? itemCurrency : undefined,
         lendingDuration: type === 'lend' ? lendingDuration : '',
         exchangePreferences: type === 'exchange' ? exchangePreferences : '',
         quantity,
@@ -596,20 +600,68 @@ export const PostItem: React.FC = () => {
             )}
 
             {type === 'sell' && (
-              <div className="max-w-xs">
-                <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  Affordable Price ($) *
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs font-bold text-rekind-muted">$</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="1000"
-                    value={price}
-                    onChange={(e) => setPrice(Number(e.target.value))}
-                    className="w-full pl-7 pr-3 py-2 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm font-semibold"
-                  />
+              <div className="space-y-4 max-w-sm">
+                <div>
+                  <label className="block text-xs font-semibold text-rekind-dark mb-1.5">
+                    Listing Currency *
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setItemCurrency('INR');
+                        if (price === 10) setPrice(150);
+                      }}
+                      className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-semibold transition-all ${
+                        itemCurrency === 'INR'
+                          ? 'border-rekind-dark bg-rekind-dark text-white shadow-xs'
+                          : 'border-rekind-border bg-white text-rekind-muted hover:border-rekind-tan'
+                      }`}
+                    >
+                      <span className="text-sm font-bold">₹</span>
+                      <span>Indian Rupee (INR)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setItemCurrency('USD');
+                        if (price === 150) setPrice(10);
+                      }}
+                      className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-semibold transition-all ${
+                        itemCurrency === 'USD'
+                          ? 'border-rekind-dark bg-rekind-dark text-white shadow-xs'
+                          : 'border-rekind-border bg-white text-rekind-muted hover:border-rekind-tan'
+                      }`}
+                    >
+                      <span className="text-sm font-bold">$</span>
+                      <span>US Dollar (USD)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-rekind-dark mb-1">
+                    Affordable Price ({itemCurrency === 'INR' ? '₹ INR' : '$ USD'}) *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-xs font-bold text-rekind-muted">
+                      {itemCurrency === 'INR' ? '₹' : '$'}
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={itemCurrency === 'INR' ? 100000 : 2000}
+                      value={price}
+                      onChange={(e) => setPrice(Number(e.target.value))}
+                      placeholder={itemCurrency === 'INR' ? 'e.g. 150' : 'e.g. 15'}
+                      className="w-full pl-8 pr-3 py-2 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm font-semibold"
+                    />
+                  </div>
+                  <p className="text-[11px] text-rekind-muted mt-1">
+                    {itemCurrency === 'INR'
+                      ? 'Set a modest, friendly second-hand price in Indian Rupees (₹).'
+                      : 'Set a modest, friendly second-hand price in US Dollars ($).'}
+                  </p>
                 </div>
               </div>
             )}
@@ -768,7 +820,7 @@ export const PostItem: React.FC = () => {
                   {type === 'donate' ? 'Free to Keep' :
                    type === 'lend' ? 'Available to Borrow' :
                    type === 'exchange' ? 'Open to Swap' :
-                   `$${price} • Affordable`}
+                   `${itemCurrency === 'INR' ? '₹' : '$'}${price} • Affordable`}
                 </span>
               </div>
               <div className="absolute bottom-3 left-3">

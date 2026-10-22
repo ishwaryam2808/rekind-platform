@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Heart, MapPin, ShieldCheck, Tag, ArrowUpRight } from 'lucide-react';
 import type { Item } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { api } from '../../services/api';
 
 interface ItemCardProps {
@@ -12,6 +13,7 @@ interface ItemCardProps {
 
 export const ItemCard: React.FC<ItemCardProps> = ({ item, onFavoriteToggle }) => {
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(item.isFavorite || false);
   const [isHovered, setIsHovered] = useState(false);
@@ -54,7 +56,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onFavoriteToggle }) =>
         };
       case 'sell':
         return {
-          label: `$${item.price} • Affordable`,
+          label: `${formatPrice(item.price, item.currency)} • Affordable`,
           bg: 'bg-[#9A634B] text-white',
         };
       default:
@@ -167,7 +169,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onFavoriteToggle }) =>
             to={`/item/${item.id}`}
             className="inline-flex items-center gap-1 text-xs font-semibold text-rekind-dark group-hover:text-rekind-terracotta transition-colors"
           >
-            <span>{item.type === 'sell' ? `$${item.price}` : 'View details'}</span>
+            <span>{item.type === 'sell' ? formatPrice(item.price, item.currency) : 'View details'}</span>
             <ArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </Link>
         </div>

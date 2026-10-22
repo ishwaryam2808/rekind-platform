@@ -11,15 +11,19 @@ import {
   Save,
   MapPin,
   Phone,
-  Sparkles
+  Sparkles,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
   const { user, updateProfile, changePassword } = useAuth();
+  const { currency, setCurrency } = useCurrency();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences'>('profile');
+  const [prefSuccess, setPrefSuccess] = useState<string | null>(null);
 
   // Profile Form State
   const [name, setName] = useState<string>(user?.name || '');
@@ -159,6 +163,18 @@ export const Settings: React.FC = () => {
         >
           <Lock className="w-4 h-4" />
           <span>Password & Security</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('preferences')}
+          className={`flex items-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold border-b-2 transition-all ${
+            activeTab === 'preferences'
+              ? 'border-rekind-dark text-rekind-dark'
+              : 'border-transparent text-rekind-muted hover:text-rekind-dark'
+          }`}
+        >
+          <Globe className="w-4 h-4" />
+          <span>Currency & Region</span>
         </button>
       </div>
 
@@ -387,6 +403,98 @@ export const Settings: React.FC = () => {
             </button>
           </div>
         </form>
+      )}
+
+      {/* TAB 3: CURRENCY & PREFERENCES */}
+      {activeTab === 'preferences' && (
+        <div className="bg-white rounded-2xl border border-rekind-border p-6 sm:p-8 space-y-6 shadow-subtle">
+          <div>
+            <h3 className="text-base font-semibold text-rekind-dark">Display Currency Preference</h3>
+            <p className="text-xs text-rekind-muted mt-0.5">
+              Choose your preferred currency for browsing item prices, posting listings, and viewing community impact savings.
+            </p>
+          </div>
+
+          {prefSuccess && (
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{prefSuccess}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* INR Card */}
+            <div
+              onClick={() => {
+                setCurrency('INR');
+                setPrefSuccess('Active currency updated to Indian Rupee (₹ INR).');
+              }}
+              className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+                currency === 'INR'
+                  ? 'border-rekind-dark bg-rekind-beige/20 shadow-xs'
+                  : 'border-rekind-border hover:border-rekind-tan bg-white'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="w-10 h-10 rounded-xl bg-rekind-sand/50 flex items-center justify-center text-xl font-bold text-rekind-dark">
+                  ₹
+                </span>
+                {currency === 'INR' && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rekind-dark text-white">
+                    Active
+                  </span>
+                )}
+              </div>
+              <h4 className="text-sm font-bold text-rekind-dark">Indian Rupee (INR)</h4>
+              <p className="text-xs text-rekind-muted mt-1 leading-relaxed">
+                Standard currency for local Indian college campuses, hostels, and neighborhood reuse communities.
+              </p>
+              <div className="mt-4 pt-3 border-t border-rekind-border/50 text-[11px] font-medium text-rekind-brown flex items-center justify-between">
+                <span>Example pricing:</span>
+                <span className="font-bold text-rekind-dark">₹150 • Affordable</span>
+              </div>
+            </div>
+
+            {/* USD Card */}
+            <div
+              onClick={() => {
+                setCurrency('USD');
+                setPrefSuccess('Active currency updated to US Dollar ($ USD).');
+              }}
+              className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+                currency === 'USD'
+                  ? 'border-rekind-dark bg-rekind-beige/20 shadow-xs'
+                  : 'border-rekind-border hover:border-rekind-tan bg-white'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="w-10 h-10 rounded-xl bg-rekind-sand/50 flex items-center justify-center text-xl font-bold text-rekind-dark">
+                  $
+                </span>
+                {currency === 'USD' && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rekind-dark text-white">
+                    Active
+                  </span>
+                )}
+              </div>
+              <h4 className="text-sm font-bold text-rekind-dark">US Dollar (USD)</h4>
+              <p className="text-xs text-rekind-muted mt-1 leading-relaxed">
+                Universal currency valuation for international campuses and global community exchanges.
+              </p>
+              <div className="mt-4 pt-3 border-t border-rekind-border/50 text-[11px] font-medium text-rekind-brown flex items-center justify-between">
+                <span>Example pricing:</span>
+                <span className="font-bold text-rekind-dark">$15 • Affordable</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-xl bg-rekind-sand/30 border border-rekind-border/60 text-xs text-rekind-brown flex items-start gap-2.5">
+            <Sparkles className="w-4 h-4 text-rekind-terracotta shrink-0 mt-0.5" />
+            <p>
+              You can also switch currencies on the fly at any time using the quick selector in the top navigation bar.
+            </p>
+          </div>
+        </div>
       )}
 
     </div>

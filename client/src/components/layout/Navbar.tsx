@@ -18,9 +18,11 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 
 export const Navbar: React.FC = () => {
   const { user, logout, unreadNotifsCount } = useAuth();
+  const { currency, setCurrency } = useCurrency();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -121,6 +123,34 @@ export const Navbar: React.FC = () => {
 
           {/* Right Header Actions */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+
+            {/* Currency Selector (INR / USD) */}
+            <div className="hidden sm:flex items-center bg-white/80 border border-rekind-border rounded-xl p-0.5 text-xs font-semibold shadow-xs">
+              <button
+                type="button"
+                onClick={() => setCurrency('INR')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  currency === 'INR'
+                    ? 'bg-rekind-dark text-white shadow-xs'
+                    : 'text-rekind-muted hover:text-rekind-dark'
+                }`}
+                title="Display prices in Indian Rupee (₹ INR)"
+              >
+                ₹ INR
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrency('USD')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  currency === 'USD'
+                    ? 'bg-rekind-dark text-white shadow-xs'
+                    : 'text-rekind-muted hover:text-rekind-dark'
+                }`}
+                title="Display prices in US Dollar ($ USD)"
+              >
+                $ USD
+              </button>
+            </div>
             
             {/* Quick Search Toggle */}
             <button
@@ -291,6 +321,35 @@ export const Navbar: React.FC = () => {
                 </Link>
               );
             })}
+
+            {/* Mobile Currency Selector */}
+            <div className="px-4 py-2 flex items-center justify-between bg-rekind-beige/40 rounded-xl border border-rekind-border/60">
+              <span className="text-xs font-semibold text-rekind-brown">Display Currency:</span>
+              <div className="flex items-center bg-white border border-rekind-border rounded-lg p-0.5 text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setCurrency('INR')}
+                  className={`px-3 py-1 rounded-md transition-all ${
+                    currency === 'INR'
+                      ? 'bg-rekind-dark text-white'
+                      : 'text-rekind-muted'
+                  }`}
+                >
+                  ₹ INR
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrency('USD')}
+                  className={`px-3 py-1 rounded-md transition-all ${
+                    currency === 'USD'
+                      ? 'bg-rekind-dark text-white'
+                      : 'text-rekind-muted'
+                  }`}
+                >
+                  $ USD
+                </button>
+              </div>
+            </div>
 
             <div className="pt-3 border-t border-rekind-border/50">
               <Link

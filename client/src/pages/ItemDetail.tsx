@@ -23,12 +23,14 @@ import confetti from 'canvas-confetti';
 import { api } from '../services/api';
 import type { Item, User } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { ItemCard } from '../components/common/ItemCard';
 
 export const ItemDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
 
   const [item, setItem] = useState<Item | null>(null);
   const [owner, setOwner] = useState<any | null>(null);
@@ -272,7 +274,7 @@ export const ItemDetail: React.FC = () => {
                 {item.type === 'donate' ? 'Free to Keep (Donation)' :
                  item.type === 'lend' ? 'Available to Borrow (Lend)' :
                  item.type === 'exchange' ? 'Open to Swap (Exchange)' :
-                 `$${item.price} • Affordable Sale`}
+                 `${formatPrice(item.price, item.currency)} • Affordable Sale`}
               </span>
 
               <div className="flex items-center gap-2">
@@ -293,7 +295,7 @@ export const ItemDetail: React.FC = () => {
             {/* Price Banner */}
             <div className="text-xl font-heading font-bold text-rekind-dark">
               {item.type === 'sell' ? (
-                <span>${item.price} <span className="text-xs text-rekind-muted font-normal">affordable second-hand</span></span>
+                <span>{formatPrice(item.price, item.currency)} <span className="text-xs text-rekind-muted font-normal">affordable second-hand</span></span>
               ) : (
                 <span className="text-rekind-brown">Free <span className="text-xs text-rekind-muted font-normal">({item.type} model)</span></span>
               )}

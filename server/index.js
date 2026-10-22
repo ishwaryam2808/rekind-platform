@@ -409,6 +409,7 @@ app.post('/api/items', authMiddleware, (req, res) => {
     condition,
     type,
     price: numericPrice,
+    currency: type === 'sell' ? (req.body.currency === 'USD' ? 'USD' : 'INR') : undefined,
     isFree,
     lendingDuration: lendingDuration ? lendingDuration.trim() : '',
     exchangePreferences: exchangePreferences ? exchangePreferences.trim() : '',
@@ -447,7 +448,7 @@ app.put('/api/items/:id', authMiddleware, (req, res) => {
     return res.status(403).json({ error: 'You can only edit your own listings.' });
   }
 
-  const fields = ['title', 'category', 'description', 'condition', 'type', 'price', 'lendingDuration', 'exchangePreferences', 'quantity', 'location', 'images', 'status', 'safetyNotes', 'tags'];
+  const fields = ['title', 'category', 'description', 'condition', 'type', 'price', 'currency', 'lendingDuration', 'exchangePreferences', 'quantity', 'location', 'images', 'status', 'safetyNotes', 'tags'];
   fields.forEach(f => {
     if (req.body[f] !== undefined) {
       item[f] = req.body[f];

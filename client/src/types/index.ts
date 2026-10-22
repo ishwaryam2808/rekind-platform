@@ -25,6 +25,7 @@ export interface Item {
   type: SharingType;
   condition: ItemCondition;
   price: number;
+  currency?: 'INR' | 'USD';
   isFree: boolean;
   lendingDuration?: string;
   exchangePreferences?: string;

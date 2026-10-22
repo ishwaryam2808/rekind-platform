@@ -14,9 +14,11 @@ import {
   Layers
 } from 'lucide-react';
 import { api } from '../services/api';
+import { useCurrency } from '../context/CurrencyContext';
 import type { ImpactMetrics, TransferRecord } from '../types';
 
 export const Impact: React.FC = () => {
+  const { formatPrice, currencySymbol } = useCurrency();
   const [metrics, setMetrics] = useState<ImpactMetrics | null>(null);
   const [categoryStats, setCategoryStats] = useState<Record<string, any>>({});
   const [typeCounts, setTypeCounts] = useState<Record<string, number>>({});
@@ -104,10 +106,10 @@ export const Impact: React.FC = () => {
         <div className="bg-white rounded-2xl border border-rekind-border p-6 shadow-subtle space-y-2">
           <div className="flex items-center justify-between text-rekind-muted">
             <span className="text-xs font-bold uppercase tracking-wider">Community Savings</span>
-            <DollarSign className="w-5 h-5 text-emerald-700" />
+            <span className="text-base font-bold text-emerald-700">{currencySymbol}</span>
           </div>
           <span className="block text-4xl font-heading font-extrabold text-rekind-dark">
-            ${metrics ? metrics.economicValueSaved : 0}
+            {metrics ? formatPrice(metrics.economicValueSaved) : formatPrice(0)}
           </span>
           <p className="text-xs text-rekind-muted">
             Calculated replacement cost saved by local students and families.
@@ -196,7 +198,7 @@ export const Impact: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <span className="font-bold text-rekind-dark block">{stat.weightKg.toFixed(1)} kg diverted</span>
-                    <span className="text-rekind-brown font-medium">~${stat.valueSaved} saved</span>
+                    <span className="text-rekind-brown font-medium">~{formatPrice(stat.valueSaved)} saved</span>
                   </div>
                 </div>
               ))
@@ -251,7 +253,7 @@ export const Impact: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-3.5 text-right font-medium text-rekind-dark">{tx.weightKg} kg</td>
-                    <td className="py-3.5 text-right font-semibold text-emerald-700">${tx.valueSaved}</td>
+                    <td className="py-3.5 text-right font-semibold text-emerald-700">{formatPrice(tx.valueSaved)}</td>
                     <td className="py-3.5 text-right text-rekind-muted">
                       {new Date(tx.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>

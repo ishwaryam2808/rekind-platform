@@ -24,8 +24,10 @@ import {
 import { api } from '../services/api';
 import type { Item, CommunityNeed, ImpactMetrics } from '../types';
 import { ItemCard } from '../components/common/ItemCard';
+import { useCurrency } from '../context/CurrencyContext';
 
 export const Home: React.FC = () => {
+  const { formatPrice } = useCurrency();
   const [recentItems, setRecentItems] = useState<Item[]>([]);
   const [freeItems, setFreeItems] = useState<Item[]>([]);
   const [urgentNeeds, setUrgentNeeds] = useState<CommunityNeed[]>([]);
@@ -588,7 +590,7 @@ export const Home: React.FC = () => {
 
             <div className="p-4 rounded-xl bg-rekind-cream/60 border border-rekind-border/60">
               <span className="block text-3xl sm:text-4xl font-heading font-extrabold text-rekind-dark">
-                {impactMetrics ? `$${impactMetrics.economicValueSaved}` : '—'}
+                {impactMetrics ? formatPrice(impactMetrics.economicValueSaved) : '—'}
               </span>
               <span className="text-xs text-rekind-muted font-medium mt-1 block">
                 Saved by Community Members
