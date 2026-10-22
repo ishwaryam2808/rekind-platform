@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "REKIND — Give Things a Second Life. Modern community reuse platform.",
   "scripts": {
+    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
     "start": "node server/index.js",
-    "build": "cd client && npm run build",
     "dev:server": "cd server && node index.js",
     "dev:client": "cd client && npm run dev",
     "reset:db": "node server/reset.js",
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+    "install:all": "npm --prefix server install && npm --prefix client install"
   },
   "keywords": [
     "sustainability",
