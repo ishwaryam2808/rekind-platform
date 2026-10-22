@@ -41,16 +41,6 @@ const CONDITIONS: ItemCondition[] = [
   'Needs TLC'
 ];
 
-// Curated authentic sample images for easy 1-click preview testing
-const SAMPLE_PHOTOS = [
-  { label: 'Calculus Textbook', url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80' },
-  { label: 'TI Graphing Calculator', url: 'https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Wood Study Desk', url: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=800&q=80' },
-  { label: 'LED Desk Lamp', url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Rain Jacket', url: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Acoustic Guitar', url: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=800&q=80' },
-];
-
 export const PostItem: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -61,22 +51,22 @@ export const PostItem: React.FC = () => {
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
 
   // Form Fields
-  const [images, setImages] = useState<string[]>([SAMPLE_PHOTOS[0].url]);
+  const [images, setImages] = useState<string[]>([]);
   const [title, setTitle] = useState<string>('');
   const [category, setCategory] = useState<string>('Books and Education');
   const [description, setDescription] = useState<string>('');
   const [condition, setCondition] = useState<ItemCondition>('Gently Used');
   const [quantity, setQuantity] = useState<number>(1);
-  const [location, setLocation] = useState<string>(user?.location || 'North Campus & Student Area');
-  const [safetyNotes, setSafetyNotes] = useState<string>('Meet at campus library or daytime public cafe.');
-  const [tags, setTags] = useState<string>('reuse, student, sharing');
+  const [location, setLocation] = useState<string>(user?.location || '');
+  const [safetyNotes, setSafetyNotes] = useState<string>('Meet at campus library or daylight public spot.');
+  const [tags, setTags] = useState<string>('');
 
   // Sharing Method & Dynamic Fields
   const initialMethod = (searchParams.get('method') as SharingType) || 'donate';
   const [type, setType] = useState<SharingType>(initialMethod);
-  const [price, setPrice] = useState<number>(15);
-  const [lendingDuration, setLendingDuration] = useState<string>('For the semester (Up to 4 months)');
-  const [exchangePreferences, setExchangePreferences] = useState<string>('Open to STEM textbooks, study lamps, or headphones');
+  const [price, setPrice] = useState<number>(10);
+  const [lendingDuration, setLendingDuration] = useState<string>('');
+  const [exchangePreferences, setExchangePreferences] = useState<string>('');
 
   // AI Assistant State
   const [aiLoading, setAiLoading] = useState<boolean>(false);
@@ -268,12 +258,12 @@ export const PostItem: React.FC = () => {
             </p>
           </div>
 
-          {/* Active Image Previews */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {images.map((img, idx) => (
-              <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-rekind-border bg-rekind-sand/20 group">
-                <img src={img} alt="Preview" className="w-full h-full object-cover" />
-                {images.length > 1 && (
+          {/* Active Image Previews / Upload Drop Area */}
+          {images.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-rekind-border bg-rekind-sand/20 group">
+                  <img src={img} alt="Preview" className="w-full h-full object-cover" />
                   <button
                     onClick={() => setImages(images.filter((_, i) => i !== idx))}
                     className="absolute top-1.5 right-1.5 p-1 bg-black/60 hover:bg-black text-white rounded-md transition-colors"
@@ -281,48 +271,45 @@ export const PostItem: React.FC = () => {
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
-                )}
-                {idx === 0 && (
-                  <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/70 text-white text-[9px] font-bold rounded">
-                    Primary
-                  </span>
-                )}
-              </div>
-            ))}
+                  {idx === 0 && (
+                    <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/70 text-white text-[9px] font-bold rounded">
+                      Primary
+                    </span>
+                  )}
+                </div>
+              ))}
 
-            {/* Upload Drop Area */}
-            <label className="border-2 border-dashed border-rekind-border hover:border-rekind-tan rounded-xl aspect-[4/3] flex flex-col items-center justify-center cursor-pointer p-4 text-center transition-colors bg-rekind-cream/50">
-              <Upload className="w-6 h-6 text-rekind-muted mb-1" />
-              <span className="text-xs font-semibold text-rekind-dark">Upload Photo</span>
-              <span className="text-[10px] text-rekind-muted">JPG, PNG up to 5MB</span>
+              {/* Upload Additional Photo */}
+              <label className="border-2 border-dashed border-rekind-border hover:border-rekind-tan rounded-xl aspect-[4/3] flex flex-col items-center justify-center cursor-pointer p-4 text-center transition-colors bg-rekind-cream/50">
+                <Upload className="w-6 h-6 text-rekind-muted mb-1" />
+                <span className="text-xs font-semibold text-rekind-dark">Add Photo</span>
+                <span className="text-[10px] text-rekind-muted">JPG, PNG up to 5MB</span>
+                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+              </label>
+            </div>
+          ) : (
+            <label className="border-2 border-dashed border-rekind-border hover:border-rekind-tan rounded-2xl py-12 px-6 flex flex-col items-center justify-center cursor-pointer text-center transition-colors bg-rekind-cream/40 space-y-2 block">
+              <div className="w-12 h-12 rounded-xl bg-rekind-beige flex items-center justify-center text-rekind-brown mx-auto">
+                <Camera className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-rekind-dark">Click to upload or drag & drop item photograph</p>
+                <p className="text-xs text-rekind-muted mt-0.5">JPEG, PNG, or WebP up to 5MB</p>
+              </div>
               <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
             </label>
-          </div>
-
-          {/* Sample Photos for Quick Testing */}
-          <div className="pt-4 border-t border-rekind-border/70 space-y-2">
-            <span className="text-xs font-semibold text-rekind-brown block">
-              Or pick an authentic sample photo for rapid testing:
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {SAMPLE_PHOTOS.map((sample) => (
-                <button
-                  key={sample.label}
-                  type="button"
-                  onClick={() => setImages([sample.url])}
-                  className="px-3 py-1.5 rounded-lg border border-rekind-border text-xs text-rekind-dark hover:border-rekind-brown bg-rekind-cream/50 transition-colors flex items-center gap-1.5"
-                >
-                  <Camera className="w-3.5 h-3.5 text-rekind-tan" />
-                  <span>{sample.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Step 1 Actions */}
           <div className="pt-4 flex justify-end">
             <button
-              onClick={() => setStep(2)}
+              onClick={() => {
+                if (images.length === 0) {
+                  alert('Please upload at least one photograph of your item to continue.');
+                  return;
+                }
+                setStep(2);
+              }}
               className="px-6 py-2.5 rounded-xl bg-rekind-dark text-white text-xs sm:text-sm font-semibold hover:bg-rekind-espresso transition-colors flex items-center gap-2"
             >
               <span>Continue to Details</span>
@@ -769,7 +756,13 @@ export const PostItem: React.FC = () => {
           {/* Preview Card */}
           <div className="max-w-sm mx-auto bg-white rounded-card border border-rekind-border overflow-hidden shadow-elevated">
             <div className="aspect-[4/3] bg-rekind-sand/30 relative">
-              <img src={images[0]} alt={title} className="w-full h-full object-cover" />
+              {images[0] ? (
+                <img src={images[0]} alt={title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-rekind-muted text-xs font-medium">
+                  No photo uploaded
+                </div>
+              )}
               <div className="absolute top-3 left-3">
                 <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-rekind-dark text-white">
                   {type === 'donate' ? 'Free to Keep' :

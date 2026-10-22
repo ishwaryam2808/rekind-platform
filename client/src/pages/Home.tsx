@@ -14,6 +14,7 @@ import {
   Users, 
   Clock, 
   Heart,
+  Package,
   BookOpen,
   Laptop,
   Home as HomeIcon,
@@ -138,7 +139,7 @@ export const Home: React.FC = () => {
                 <div className="relative rounded-2xl overflow-hidden shadow-float border border-rekind-border bg-rekind-sand/30 aspect-[4/5]">
                   <img
                     src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1000&q=80"
-                    alt="Stewart Calculus and educational books"
+                    alt="Community items reuse"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -146,10 +147,10 @@ export const Home: React.FC = () => {
                   {/* Floating Tag on Main Photo */}
                   <div className="absolute bottom-6 left-6 right-6 text-white space-y-1.5">
                     <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-medium tracking-wide uppercase">
-                      Curated Reuse
+                      Community Platform
                     </span>
                     <p className="font-heading font-bold text-lg leading-tight">
-                      Textbooks, calculators & hostel essentials passed on between students.
+                      Giving unused items a grateful second life with people who need them.
                     </p>
                   </div>
                 </div>
@@ -157,15 +158,13 @@ export const Home: React.FC = () => {
                 {/* Overlapping Floating Small Card 1 (Top Right) */}
                 <div className="absolute -top-4 -right-4 sm:-right-6 w-44 sm:w-48 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-rekind-border shadow-elevated hidden sm:block animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <div className="flex items-center gap-2.5">
-                    <img
-                      src="https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&w=200&q=80"
-                      alt="Calculator"
-                      className="w-11 h-11 rounded-xl object-cover shrink-0 border border-rekind-border"
-                    />
+                    <div className="w-10 h-10 rounded-xl bg-rekind-espresso text-rekind-sand flex items-center justify-center shrink-0">
+                      <Repeat className="w-5 h-5 text-rekind-tan" />
+                    </div>
                     <div className="overflow-hidden">
-                      <span className="text-[10px] font-bold text-rekind-terracotta uppercase">Lending Circle</span>
-                      <p className="text-xs font-semibold text-rekind-dark truncate">TI-84 CE Calculator</p>
-                      <p className="text-[10px] text-rekind-muted">Semester loan • Free</p>
+                      <span className="text-[10px] font-bold text-rekind-terracotta uppercase">Circular Sharing</span>
+                      <p className="text-xs font-semibold text-rekind-dark truncate">Give, Lend & Swap</p>
+                      <p className="text-[10px] text-rekind-muted">Community circularity</p>
                     </div>
                   </div>
                 </div>
@@ -322,8 +321,13 @@ export const Home: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white rounded-card border border-rekind-border">
-            <p className="text-sm text-rekind-muted">No items available yet.</p>
+          <div className="text-center py-12 px-4 bg-white rounded-2xl border border-rekind-border space-y-3 max-w-lg mx-auto">
+            <Package className="w-10 h-10 text-rekind-muted mx-auto" />
+            <h3 className="font-heading font-bold text-base text-rekind-dark">No items available yet</h3>
+            <p className="text-xs text-rekind-muted">Be the first to give an unused textbook, tool, or household item a second life.</p>
+            <Link to="/post-item" className="inline-block px-5 py-2.5 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors">
+              Share an Item
+            </Link>
           </div>
         )}
       </section>
@@ -353,11 +357,22 @@ export const Home: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {freeItems.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
-          </div>
+          {freeItems.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {freeItems.map((item) => (
+                <ItemCard key={item.id} item={item} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 px-4 bg-white/80 rounded-2xl border border-rekind-border space-y-3 max-w-lg mx-auto">
+              <Gift className="w-10 h-10 text-rekind-muted mx-auto" />
+              <h3 className="font-heading font-bold text-base text-rekind-dark">No free items listed yet</h3>
+              <p className="text-xs text-rekind-muted">Have supplies you no longer need? Pass them on to neighbors completely free.</p>
+              <Link to="/post-item?method=donate" className="inline-block px-5 py-2.5 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors">
+                List a Free Giveaway
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -384,58 +399,69 @@ export const Home: React.FC = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {urgentNeeds.map((need) => (
-            <div
-              key={need.id}
-              className="bg-white rounded-card p-6 border border-rekind-border hover:border-rekind-tan transition-all shadow-subtle hover:shadow-elevated flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`px-2.5 py-0.5 text-[11px] font-bold rounded-full ${
-                    need.urgency === 'Critical' ? 'bg-red-100 text-red-800' :
-                    need.urgency === 'High' ? 'bg-amber-100 text-amber-900' :
-                    'bg-rekind-sand/50 text-rekind-dark'
-                  }`}>
-                    {need.urgency} Urgency
-                  </span>
-                  <span className="text-[11px] text-rekind-muted font-medium">
-                    {need.category}
-                  </span>
-                </div>
-
-                <h3 className="font-heading font-bold text-base text-rekind-dark mb-2 line-clamp-2">
-                  {need.title}
-                </h3>
-
-                <p className="text-xs text-rekind-muted line-clamp-3 leading-relaxed mb-4">
-                  {need.description}
-                </p>
-              </div>
-
-              <div className="pt-4 border-t border-rekind-border/60 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <img
-                    src={need.requesterAvatar}
-                    alt={need.requesterName}
-                    className="w-6 h-6 rounded-full object-cover border border-rekind-sand"
-                  />
-                  <div className="text-[11px]">
-                    <p className="font-semibold text-rekind-dark">{need.requesterName}</p>
-                    <p className="text-rekind-muted text-[10px]">{need.location}</p>
+        {urgentNeeds.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {urgentNeeds.map((need) => (
+              <div
+                key={need.id}
+                className="bg-white rounded-card p-6 border border-rekind-border hover:border-rekind-tan transition-all shadow-subtle hover:shadow-elevated flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`px-2.5 py-0.5 text-[11px] font-bold rounded-full ${
+                      need.urgency === 'Critical' ? 'bg-red-100 text-red-800' :
+                      need.urgency === 'High' ? 'bg-amber-100 text-amber-900' :
+                      'bg-rekind-sand/50 text-rekind-dark'
+                    }`}>
+                      {need.urgency} Urgency
+                    </span>
+                    <span className="text-[11px] text-rekind-muted font-medium">
+                      {need.category}
+                    </span>
                   </div>
+
+                  <h3 className="font-heading font-bold text-base text-rekind-dark mb-2 line-clamp-2">
+                    {need.title}
+                  </h3>
+
+                  <p className="text-xs text-rekind-muted line-clamp-3 leading-relaxed mb-4">
+                    {need.description}
+                  </p>
                 </div>
 
-                <Link
-                  to={`/community-needs?offer=${need.id}`}
-                  className="px-3 py-1.5 rounded-lg bg-rekind-dark text-rekind-sand hover:bg-rekind-espresso text-xs font-semibold transition-colors"
-                >
-                  Offer Item
-                </Link>
+                <div className="pt-4 border-t border-rekind-border/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={need.requesterAvatar}
+                      alt={need.requesterName}
+                      className="w-6 h-6 rounded-full object-cover border border-rekind-sand"
+                    />
+                    <div className="text-[11px]">
+                      <p className="font-semibold text-rekind-dark">{need.requesterName}</p>
+                      <p className="text-rekind-muted text-[10px]">{need.location}</p>
+                    </div>
+                  </div>
+
+                  <Link
+                    to={`/community-needs?offer=${need.id}`}
+                    className="px-3 py-1.5 rounded-lg bg-rekind-dark text-rekind-sand hover:bg-rekind-espresso text-xs font-semibold transition-colors"
+                  >
+                    Offer Item
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 px-4 bg-white rounded-2xl border border-rekind-border space-y-3 max-w-lg mx-auto">
+            <HelpCircle className="w-10 h-10 text-rekind-muted mx-auto" />
+            <h3 className="font-heading font-bold text-base text-rekind-dark">No community requests yet</h3>
+            <p className="text-xs text-rekind-muted">Looking for a specific textbook, calculator, or household essential? Post what you need.</p>
+            <Link to="/community-needs" className="inline-block px-5 py-2.5 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors">
+              Post a Community Need
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* 6. HOW REKIND WORKS IN THREE SIMPLE STEPS */}
@@ -579,6 +605,12 @@ export const Home: React.FC = () => {
             </div>
 
           </div>
+
+          {impactMetrics?.totalTransfers === 0 && (
+            <p className="mt-6 text-center text-xs text-rekind-muted">
+              🌱 The community impact ledger is clean and ready. Once handovers are completed and verified between members, real statistics will calculate here automatically.
+            </p>
+          )}
 
           <div className="mt-8 text-center">
             <Link

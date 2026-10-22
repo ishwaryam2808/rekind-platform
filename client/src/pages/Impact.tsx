@@ -151,7 +151,7 @@ export const Impact: React.FC = () => {
               { label: 'Item Exchanges', count: typeCounts.exchange || 0, color: 'bg-rekind-brown' },
               { label: 'Affordable Sales', count: typeCounts.sell || 0, color: 'bg-[#9A634B]' }
             ].map((m) => {
-              const pct = Math.round((m.count / totalTypes) * 100);
+              const pct = (metrics && metrics.totalTransfers > 0) ? Math.round((m.count / metrics.totalTransfers) * 100) : 0;
               return (
                 <div key={m.label} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-medium">
@@ -167,7 +167,11 @@ export const Impact: React.FC = () => {
           </div>
 
           <div className="p-4 rounded-xl bg-rekind-cream border border-rekind-border text-xs text-rekind-brown font-medium leading-relaxed">
-            🌿 Over <strong>{Math.round((( (typeCounts.donate || 0) + (typeCounts.lend || 0) + (typeCounts.exchange || 0) ) / totalTypes) * 100)}%</strong> of all community transfers on REKIND take place with zero money changing hands.
+            {metrics && metrics.totalTransfers > 0 ? (
+              <span>🌿 Over <strong>{Math.round((( (typeCounts.donate || 0) + (typeCounts.lend || 0) + (typeCounts.exchange || 0) ) / metrics.totalTransfers) * 100)}%</strong> of all community transfers on REKIND take place with zero money changing hands.</span>
+            ) : (
+              <span>🌿 The community ledger is initialized and clean. Once members complete and verify item transfers, circularity distributions will calculate here.</span>
+            )}
           </div>
         </div>
 
@@ -235,23 +239,31 @@ export const Impact: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-rekind-border/50">
-              {auditLedger.map((tx) => (
-                <tr key={tx.id} className="hover:bg-rekind-cream/40 transition-colors">
-                  <td className="py-3.5 font-mono text-rekind-muted">{tx.id}</td>
-                  <td className="py-3.5 font-semibold text-rekind-dark">{tx.itemTitle}</td>
-                  <td className="py-3.5 text-rekind-muted">{tx.category}</td>
-                  <td className="py-3.5">
-                    <span className="capitalize px-2 py-0.5 rounded bg-rekind-sand/40 text-rekind-brown font-medium">
-                      {tx.sharingType}
-                    </span>
-                  </td>
-                  <td className="py-3.5 text-right font-medium text-rekind-dark">{tx.weightKg} kg</td>
-                  <td className="py-3.5 text-right font-semibold text-emerald-700">${tx.valueSaved}</td>
-                  <td className="py-3.5 text-right text-rekind-muted">
-                    {new Date(tx.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+              {auditLedger.length > 0 ? (
+                auditLedger.map((tx) => (
+                  <tr key={tx.id} className="hover:bg-rekind-cream/40 transition-colors">
+                    <td className="py-3.5 font-mono text-rekind-muted">{tx.id}</td>
+                    <td className="py-3.5 font-semibold text-rekind-dark">{tx.itemTitle}</td>
+                    <td className="py-3.5 text-rekind-muted">{tx.category}</td>
+                    <td className="py-3.5">
+                      <span className="capitalize px-2 py-0.5 rounded bg-rekind-sand/40 text-rekind-brown font-medium">
+                        {tx.sharingType}
+                      </span>
+                    </td>
+                    <td className="py-3.5 text-right font-medium text-rekind-dark">{tx.weightKg} kg</td>
+                    <td className="py-3.5 text-right font-semibold text-emerald-700">${tx.valueSaved}</td>
+                    <td className="py-3.5 text-right text-rekind-muted">
+                      {new Date(tx.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-xs text-rekind-muted">
+                    No completed transfers recorded yet. The verified audit ledger updates automatically as community members confirm item handovers.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

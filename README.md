@@ -37,18 +37,19 @@ REKIND is a full-stack community sustainability and circular economy platform th
 | `/profile` | **Public Profile** | User avatar, trust score, community badges, verified reuse stats, and active listings. |
 | `/settings` | **Account Settings** | Update profile info, location, bio, and change password with live strength verification. |
 | `/impact` | **Impact Dashboard** | Verifiable completed transfer ledger, category breakdown, method distribution, and diverted waste analytics. |
-| `/auth` | **Sign In & Register** | Secure authentication with live password feedback and one-click demo reviewer test accounts. |
+| `/auth` | **Sign In & Register** | Secure authentication with live password feedback and registration for community members. |
 
 ---
 
-## 👥 Reviewer Demo Accounts
+## 🧹 Clean State & Database Reset
 
-You can log in to any of these accounts with the password `Password123!` or click the **One-Click Reviewer Test Logins** buttons on the `/auth` page or user menu:
+The platform starts completely clean and empty on first use. No demo users, sample items, or simulated transactions exist. Real users can register on the `/auth` page to start sharing items and making requests.
 
-1. **Maya Sen (Engineering Student & Top Giver)**: `maya.sen@campus.edu`
-2. **David Rivera (Community Maker & Woodworker)**: `david.r@community.org`
-3. **Amina El-Amin (Family Circle & Book Giver)**: `amina@familycare.net`
-4. **Kiran Patel (Robotics Student & Tech Lender)**: `kiran.p@techhub.io`
+To reset the database back to this clean, empty state at any time:
+
+```bash
+npm run reset:db
+```
 
 ---
 

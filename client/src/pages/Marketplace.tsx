@@ -376,21 +376,32 @@ export const Marketplace: React.FC = () => {
             <PackageOpen className="w-7 h-7" />
           </div>
           <h3 className="font-heading font-bold text-lg text-rekind-dark">
-            No matching items found
+            {hasActiveFilters ? 'No matching items found' : 'No items available yet'}
           </h3>
           <p className="text-xs sm:text-sm text-rekind-muted leading-relaxed">
-            We couldn't find items matching your search or filters. Try adjusting your keywords, expanding the category, or posting a community request so someone can offer it to you!
+            {hasActiveFilters
+              ? "We couldn't find items matching your search or filters. Try clearing your filters or posting an item request."
+              : "Nothing here yet. Get started by creating your first listing or request an item you need on the Community Needs board."}
           </p>
           <div className="pt-2 flex flex-wrap justify-center gap-3">
-            <button
-              onClick={clearAllFilters}
-              className="px-4 py-2 rounded-xl bg-rekind-beige text-rekind-brown text-xs font-semibold hover:bg-rekind-sand transition-colors"
-            >
-              Clear Filters
-            </button>
+            {hasActiveFilters ? (
+              <button
+                onClick={clearAllFilters}
+                className="px-5 py-2.5 rounded-xl bg-rekind-beige text-rekind-brown text-xs font-semibold hover:bg-rekind-sand transition-colors"
+              >
+                Clear All Filters
+              </button>
+            ) : (
+              <Link
+                to="/post-item"
+                className="px-5 py-2.5 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors"
+              >
+                Share an Item
+              </Link>
+            )}
             <Link
               to="/community-needs"
-              className="px-4 py-2 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-white border border-rekind-border text-rekind-dark text-xs font-semibold hover:bg-rekind-cream transition-colors"
             >
               Post a Community Need
             </Link>

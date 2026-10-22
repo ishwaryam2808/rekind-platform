@@ -72,12 +72,18 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onFavoriteToggle }) =>
     >
       {/* Image Container with Badge */}
       <Link to={`/item/${item.id}`} className="relative block aspect-[4/3] w-full overflow-hidden bg-rekind-beige/40">
-        <img
-          src={item.images[0] || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80'}
-          alt={item.title}
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-          loading="lazy"
-        />
+        {item.images[0] ? (
+          <img
+            src={item.images[0]}
+            alt={item.title}
+            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-rekind-sand/30 text-rekind-muted text-xs font-semibold">
+            No image
+          </div>
+        )}
 
         {/* Status overlay if reserved */}
         {item.status === 'reserved' && (

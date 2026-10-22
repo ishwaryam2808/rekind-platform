@@ -11,7 +11,6 @@ interface AuthContextType {
   logout: () => void;
   updateProfile: (profileData: any) => Promise<void>;
   changePassword: (passwordData: any) => Promise<void>;
-  switchDemoUser: (email: string) => Promise<void>;
   unreadNotifsCount: number;
   refreshNotificationsCount: () => Promise<void>;
 }
@@ -93,11 +92,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await api.changePassword(passwordData);
   };
 
-  // Helper for demo reviews to test any persona seamlessly
-  const switchDemoUser = async (email: string) => {
-    await login({ email, password: 'Password123!' });
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -109,7 +103,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         updateProfile,
         changePassword,
-        switchDemoUser,
         unreadNotifsCount,
         refreshNotificationsCount,
       }}

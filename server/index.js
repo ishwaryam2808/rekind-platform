@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getDb, saveDb } from './db.js';
+import { getDb, saveDb, resetDatabase } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -390,9 +390,11 @@ app.post('/api/items', authMiddleware, (req, res) => {
   const isFree = type === 'donate' || type === 'lend' || type === 'exchange';
   const numericPrice = type === 'sell' ? (Number(price) || 0) : 0;
 
-  const validImages = Array.isArray(images) && images.length > 0 ? images : [
-    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80'
-  ];
+  if (!images || !Array.isArray(images) || images.length === 0) {
+    return res.status(400).json({ error: 'Please upload at least one photograph of the item.' });
+  }
+
+  const validImages = images;
 
   const newItem = {
     id: genId('item'),
@@ -1274,6 +1276,12 @@ app.post('/api/ai/suggest', (req, res) => {
       similarItems
     }
   });
+});
+
+// Admin reset endpoint to safely restore a clean, first-use database state at any time
+app.post('/api/admin/reset', (req, res) => {
+  resetDatabase();
+  res.json({ message: 'Database reset to clean first-use state successfully.' });
 });
 
 // -------------------------------------------------------------

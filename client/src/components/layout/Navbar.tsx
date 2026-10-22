@@ -20,7 +20,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar: React.FC = () => {
-  const { user, logout, unreadNotifsCount, switchDemoUser } = useAuth();
+  const { user, logout, unreadNotifsCount } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -208,39 +208,6 @@ export const Navbar: React.FC = () => {
                         <Settings className="w-4 h-4 text-rekind-muted" />
                         Account Settings
                       </Link>
-                    </div>
-
-                    {/* Switch Demo Persona Quick Bar */}
-                    <div className="px-4 py-2 border-t border-rekind-border/60 bg-rekind-cream/50">
-                      <p className="text-[10px] font-bold text-rekind-muted uppercase tracking-wider mb-1.5">
-                        Switch Demo Persona
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        <button
-                          onClick={() => { switchDemoUser('maya.sen@campus.edu'); setProfileDropdownOpen(false); }}
-                          className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
-                            user.email === 'maya.sen@campus.edu' ? 'bg-rekind-dark text-white border-rekind-dark' : 'bg-white border-rekind-border text-rekind-muted hover:text-rekind-dark'
-                          }`}
-                        >
-                          Maya (Student)
-                        </button>
-                        <button
-                          onClick={() => { switchDemoUser('david.r@community.org'); setProfileDropdownOpen(false); }}
-                          className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
-                            user.email === 'david.r@community.org' ? 'bg-rekind-dark text-white border-rekind-dark' : 'bg-white border-rekind-border text-rekind-muted hover:text-rekind-dark'
-                          }`}
-                        >
-                          David (Maker)
-                        </button>
-                        <button
-                          onClick={() => { switchDemoUser('kiran.p@techhub.io'); setProfileDropdownOpen(false); }}
-                          className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
-                            user.email === 'kiran.p@techhub.io' ? 'bg-rekind-dark text-white border-rekind-dark' : 'bg-white border-rekind-border text-rekind-muted hover:text-rekind-dark'
-                          }`}
-                        >
-                          Kiran (Tech)
-                        </button>
-                      </div>
                     </div>
 
                     <div className="border-t border-rekind-border/60 pt-1">

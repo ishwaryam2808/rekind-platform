@@ -364,8 +364,28 @@ export const CommunityNeeds: React.FC = () => {
       ) : (
         <div className="text-center py-16 bg-white rounded-2xl border border-rekind-border p-8 max-w-lg mx-auto space-y-4">
           <HelpCircle className="w-12 h-12 text-rekind-muted mx-auto" />
-          <h3 className="font-heading font-bold text-lg text-rekind-dark">No requests matching criteria</h3>
-          <p className="text-xs text-rekind-muted">Try clearing your filters or create a new community need request.</p>
+          <h3 className="font-heading font-bold text-lg text-rekind-dark">
+            {category !== 'All' || urgency !== 'All' || search ? 'No requests matching criteria' : 'No community requests yet'}
+          </h3>
+          <p className="text-xs text-rekind-muted leading-relaxed">
+            {category !== 'All' || urgency !== 'All' || search
+              ? 'Try resetting your search or filters to see more requests.'
+              : 'Looking for a specific textbook, calculator, or household item? Post what you need and neighbors can reach out to help.'}
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={() => {
+                if (!user) {
+                  navigate('/auth');
+                } else {
+                  setCreateModalOpen(true);
+                }
+              }}
+              className="px-5 py-2.5 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors"
+            >
+              Post an Item Request
+            </button>
+          </div>
         </div>
       )}
 

@@ -19,7 +19,7 @@ import { useAuth } from '../context/AuthContext';
 export const Auth: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, register, user, switchDemoUser } = useAuth();
+  const { login, register, user } = useAuth();
 
   const [mode, setMode] = useState<'signin' | 'register'>((searchParams.get('mode') as any) || 'signin');
   const [loading, setLoading] = useState<boolean>(false);
@@ -108,19 +108,6 @@ export const Auth: React.FC = () => {
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Authentication error.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoSignIn = async (demoEmail: string) => {
-    setLoading(true);
-    setErrorMessage(null);
-    try {
-      await switchDemoUser(demoEmail);
-      navigate('/marketplace');
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Demo sign in failed.');
     } finally {
       setLoading(false);
     }
@@ -335,50 +322,6 @@ export const Auth: React.FC = () => {
             <ArrowRight className="w-4 h-4 text-rekind-tan" />
           </button>
         </form>
-
-        {/* 1-Click Demo Accounts Picker */}
-        <div className="pt-4 border-t border-rekind-border/70 space-y-2">
-          <p className="text-[11px] font-bold text-rekind-muted uppercase tracking-wider text-center">
-            One-Click Reviewer Test Logins
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() => handleDemoSignIn('maya.sen@campus.edu')}
-              className="p-2 rounded-xl border border-rekind-border bg-rekind-cream/50 hover:bg-rekind-sand/40 text-left transition-colors"
-            >
-              <span className="font-bold text-rekind-dark block">Maya Sen</span>
-              <span className="text-[10px] text-rekind-muted">Engineering Student</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemoSignIn('david.r@community.org')}
-              className="p-2 rounded-xl border border-rekind-border bg-rekind-cream/50 hover:bg-rekind-sand/40 text-left transition-colors"
-            >
-              <span className="font-bold text-rekind-dark block">David Rivera</span>
-              <span className="text-[10px] text-rekind-muted">Community Maker</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemoSignIn('amina@familycare.net')}
-              className="p-2 rounded-xl border border-rekind-border bg-rekind-cream/50 hover:bg-rekind-sand/40 text-left transition-colors"
-            >
-              <span className="font-bold text-rekind-dark block">Amina El-Amin</span>
-              <span className="text-[10px] text-rekind-muted">Family Circle Giver</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemoSignIn('kiran.p@techhub.io')}
-              className="p-2 rounded-xl border border-rekind-border bg-rekind-cream/50 hover:bg-rekind-sand/40 text-left transition-colors"
-            >
-              <span className="font-bold text-rekind-dark block">Kiran Patel</span>
-              <span className="text-[10px] text-rekind-muted">Tech Student & Lender</span>
-            </button>
-          </div>
-        </div>
 
       </div>
 
