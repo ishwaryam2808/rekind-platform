@@ -74,21 +74,24 @@ export const Auth: React.FC = () => {
     setLoading(true);
 
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanPassword = password.trim();
+
       if (mode === 'signin') {
-        await login({ email, password });
+        await login({ email: cleanEmail, password: cleanPassword });
         navigate('/marketplace');
       } else {
         // Register validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(cleanEmail)) {
           throw new Error('Please enter a valid email address.');
         }
 
-        if (password.length < 8) {
+        if (cleanPassword.length < 8) {
           throw new Error('Password must be at least 8 characters.');
         }
 
-        if (password !== confirmPassword) {
+        if (cleanPassword !== confirmPassword.trim()) {
           throw new Error('Passwords do not match.');
         }
 
@@ -97,12 +100,12 @@ export const Auth: React.FC = () => {
         }
 
         await register({
-          name,
-          email,
-          phone,
-          location,
-          password,
-          confirmPassword
+          name: name.trim(),
+          email: cleanEmail,
+          phone: phone.trim(),
+          location: location.trim(),
+          password: cleanPassword,
+          confirmPassword: cleanPassword
         });
         navigate('/marketplace');
       }
@@ -163,9 +166,29 @@ export const Auth: React.FC = () => {
 
         {/* Error Alert */}
         {errorMessage && (
-          <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-medium text-red-800 flex items-center gap-2 animate-in fade-in">
-            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-            <span>{errorMessage}</span>
+          <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-medium text-red-800 flex items-start gap-2 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p>{errorMessage}</p>
+              {mode === 'signin' && errorMessage.toLowerCase().includes('no account') && (
+                <button
+                  type="button"
+                  onClick={() => { setMode('register'); setErrorMessage(null); }}
+                  className="mt-1.5 text-xs font-bold text-rekind-dark underline hover:text-rekind-brown block"
+                >
+                  Click here to create an account →
+                </button>
+              )}
+              {mode === 'register' && errorMessage.toLowerCase().includes('already exists') && (
+                <button
+                  type="button"
+                  onClick={() => { setMode('signin'); setErrorMessage(null); }}
+                  className="mt-1.5 text-xs font-bold text-rekind-dark underline hover:text-rekind-brown block"
+                >
+                  Click here to sign in to your existing account →
+                </button>
+              )}
+            </div>
           </div>
         )}
 

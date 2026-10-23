@@ -70,35 +70,37 @@ app.post('/api/auth/register', (req, res) => {
     return res.status(400).json({ error: 'Full name, email, and password are required.' });
   }
 
+  const normalizedEmail = String(email).trim().toLowerCase();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!emailRegex.test(normalizedEmail)) {
     return res.status(400).json({ error: 'Please enter a valid email address.' });
   }
 
-  if (password.length < 8) {
+  const cleanPassword = String(password).trim();
+  if (cleanPassword.length < 8) {
     return res.status(400).json({ error: 'Password must be at least 8 characters long.' });
   }
 
-  if (confirmPassword && password !== confirmPassword) {
+  if (confirmPassword && cleanPassword !== String(confirmPassword).trim()) {
     return res.status(400).json({ error: 'Passwords do not match.' });
   }
 
   const db = getDb();
-  const existing = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const existing = db.users.find(u => (u.email || '').trim().toLowerCase() === normalizedEmail);
   if (existing) {
-    return res.status(409).json({ error: 'An account with this email already exists.' });
+    return res.status(409).json({ error: 'An account with this email already exists. Please sign in.' });
   }
 
   const salt = bcrypt.genSaltSync(10);
-  const passwordHash = bcrypt.hashSync(password, salt);
+  const passwordHash = bcrypt.hashSync(cleanPassword, salt);
 
   const newUser = {
     id: genId('usr'),
     name: name.trim(),
-    email: email.toLowerCase().trim(),
+    email: normalizedEmail,
     passwordHash,
-    phone: phone ? phone.trim() : '',
-    location: location ? location.trim() : 'Local Community Member',
+    phone: phone ? String(phone).trim() : '',
+    location: location ? String(location).trim() : 'Local Community Member',
     avatar: avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=e6ddd2,c2a68c,9a634b`,
     bio: 'Proud to be part of the REKIND community. Looking to share unused resources and make things go further.',
     badges: ['Community Pioneer', 'Verified Member'],
@@ -125,15 +127,18 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(400).json({ error: 'Email and password are required.' });
   }
 
+  const normalizedEmail = String(email).trim().toLowerCase();
   const db = getDb();
-  const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
+  const user = db.users.find(u => (u.email || '').trim().toLowerCase() === normalizedEmail);
   if (!user) {
-    return res.status(401).json({ error: 'Invalid email or password.' });
+    return res.status(401).json({ error: 'No account registered with this email address. Please sign up first.' });
   }
 
-  const matches = bcrypt.compareSync(password, user.passwordHash);
+  const passStr = String(password);
+  const matches = bcrypt.compareSync(passStr, user.passwordHash) || 
+                  bcrypt.compareSync(passStr.trim(), user.passwordHash);
   if (!matches) {
-    return res.status(401).json({ error: 'Invalid email or password.' });
+    return res.status(401).json({ error: 'Incorrect password. Please verify and try again.' });
   }
 
   const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
