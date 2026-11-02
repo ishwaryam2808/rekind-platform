@@ -65,6 +65,7 @@ export const Navbar: React.FC = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Machinery Catalog', path: '/marketplace' },
+    { name: 'AI Fleet Matchmaker', path: '/tender-matchmaker', isAi: true },
     { name: 'Equipment Demands', path: '/community-needs' },
     { name: 'Sharing Models', path: '/share' },
     { name: 'Asset Impact', path: '/impact' },
@@ -122,6 +123,11 @@ export const Navbar: React.FC = () => {
                   }`}
                 >
                   {link.name}
+                  {link.isAi && (
+                    <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-teal-600 text-white tracking-wider">
+                      AI
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -338,6 +344,11 @@ export const Navbar: React.FC = () => {
                   }`}
                 >
                   {link.name}
+                  {link.isAi && (
+                    <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-teal-600 text-white tracking-wider">
+                      AI
+                    </span>
+                  )}
                 </Link>
               );
             })}

@@ -17,7 +17,9 @@ import {
   AlertTriangle, 
   MessageSquare,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Bot,
+  Cpu
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
@@ -25,6 +27,8 @@ import type { Item, User } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { ItemCard } from '../components/common/ItemCard';
+import { MLAssetValuationCard } from '../components/common/MLAssetValuationCard';
+import { MachineryCopilotModal } from '../components/common/MachineryCopilotModal';
 
 export const ItemDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,6 +51,9 @@ export const ItemDetail: React.FC = () => {
   const [meetupPreference, setMeetupPreference] = useState<string>('Central Campus or Public Library');
   const [submittingRequest, setSubmittingRequest] = useState<boolean>(false);
   const [requestSuccess, setRequestSuccess] = useState<boolean>(false);
+
+  // Digital Twin AI Copilot State
+  const [copilotOpen, setCopilotOpen] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadItem() {
@@ -530,10 +537,25 @@ export const ItemDetail: React.FC = () => {
                 </button>
               </div>
             )}
+
+            {/* AI Machinery Copilot Trigger Button */}
+            <button
+              onClick={() => setCopilotOpen(true)}
+              className="w-full mt-3 py-3 px-4 rounded-xl bg-slate-900 border border-teal-500/40 hover:border-teal-400 text-teal-300 hover:text-white transition-all text-xs font-bold flex items-center justify-center gap-2 shadow-lg group"
+            >
+              <Bot className="w-4 h-4 text-teal-400 group-hover:scale-110 transition-transform" />
+              <span>Launch OEM Engineering Copilot (Digital Twin Q&A)</span>
+              <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+            </button>
           </div>
 
         </div>
 
+      </div>
+
+      {/* ML Predictive Health & Asset Valuation Section */}
+      <div className="pt-8">
+        <MLAssetValuationCard item={item} />
       </div>
 
       {/* Related Items Section */}
@@ -674,6 +696,13 @@ export const ItemDetail: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* MACHINERY COPILOT MODAL */}
+      <MachineryCopilotModal
+        isOpen={copilotOpen}
+        onClose={() => setCopilotOpen(false)}
+        item={item}
+      />
 
     </div>
   );

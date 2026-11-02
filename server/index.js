@@ -5,6 +5,9 @@ import bcrypt from 'bcryptjs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getDb, saveDb, resetDatabase } from './db.js';
+import { calculateMLDiagnostics } from './ai/mlEngine.js';
+import { queryMachineryCopilot } from './ai/ragEngine.js';
+import { analyzeRfpAndMatchFleet } from './ai/nlpTenderMatchmaker.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1498,6 +1501,58 @@ app.post('/api/ai/suggest', (req, res) => {
       similarItems
     }
   });
+});
+
+// =============================================================
+// INDUSTRIAL AI SUITE ENDPOINTS (ML, RAG & NLP/LLM)
+// =============================================================
+
+// 1. ML Asset Valuation & Component Remaining Useful Life (RUL)
+app.post('/api/ai/ml-diagnostics', (req, res) => {
+  try {
+    const diagnostics = calculateMLDiagnostics(req.body);
+    res.json({ diagnostics });
+  } catch (error) {
+    console.error('[AI] ML Diagnostics error:', error.message);
+    res.status(400).json({ error: error.message || 'Failed to compute ML diagnostics' });
+  }
+});
+
+// 2. RAG Machinery Copilot / Digital Twin Technical Q&A
+app.post('/api/ai/machinery-copilot', (req, res) => {
+  try {
+    const { itemId, question, conversationHistory } = req.body;
+    let item = null;
+    if (itemId) {
+      const db = getDb();
+      item = db.items.find(i => i.id === itemId);
+    }
+    if (!item) {
+      // Allow passing transient item details in body if not in DB
+      item = req.body.item || { title: 'Industrial Equipment', category: 'Heavy Machinery' };
+    }
+
+    const copilotResult = queryMachineryCopilot(item, question, conversationHistory || []);
+    res.json(copilotResult);
+  } catch (error) {
+    console.error('[AI] Copilot error:', error.message);
+    res.status(500).json({ error: error.message || 'Machinery Copilot query failed' });
+  }
+});
+
+// 3. NLP Tender / RFP Fleet Allocation Matchmaker
+app.post('/api/ai/rfp-matchmaker', (req, res) => {
+  try {
+    const { projectBrief } = req.body;
+    if (!projectBrief) {
+      return res.status(400).json({ error: 'Project brief or tender work scope text is required.' });
+    }
+    const matchmakerPlan = analyzeRfpAndMatchFleet(projectBrief);
+    res.json({ plan: matchmakerPlan });
+  } catch (error) {
+    console.error('[AI] Tender Matchmaker error:', error.message);
+    res.status(400).json({ error: error.message || 'Failed to optimize tender fleet allocation' });
+  }
 });
 
 // Admin reset endpoint to safely restore a clean, first-use database state at any time

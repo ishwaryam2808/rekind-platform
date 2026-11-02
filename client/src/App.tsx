@@ -19,6 +19,7 @@ import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
 import { Impact } from './pages/Impact';
 import { Auth } from './pages/Auth';
+import { TenderMatchmaker } from './pages/TenderMatchmaker';
 
 export const App: React.FC = () => {
   return (
@@ -32,6 +33,8 @@ export const App: React.FC = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/item/:id" element={<ItemDetail />} />
+                <Route path="/items/:id" element={<ItemDetail />} />
+                <Route path="/tender-matchmaker" element={<TenderMatchmaker />} />
                 <Route path="/post-item" element={<PostItem />} />
                 <Route path="/community-needs" element={<CommunityNeeds />} />
                 <Route path="/share" element={<ShareGuide />} />

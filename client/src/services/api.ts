@@ -95,6 +95,9 @@ export const api = {
   // Impact Dashboard
   getImpact: () => request<any>('/impact'),
 
-  // AI Assistant
+  // AI Assistant & Industrial Intelligence Suite
   getAiSuggestions: (promptData: any) => request<any>('/ai/suggest', { method: 'POST', body: JSON.stringify(promptData) }),
+  getMLDiagnostics: (data: any) => request<any>('/ai/ml-diagnostics', { method: 'POST', body: JSON.stringify(data) }),
+  askMachineryCopilot: (data: { itemId?: string; question: string; item?: any; conversationHistory?: any[] }) => request<any>('/ai/machinery-copilot', { method: 'POST', body: JSON.stringify(data) }),
+  matchTenderRfp: (projectBrief: string) => request<any>('/ai/rfp-matchmaker', { method: 'POST', body: JSON.stringify({ projectBrief }) }),
 };
