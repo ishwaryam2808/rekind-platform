@@ -21,20 +21,20 @@ export const ShareGuide: React.FC = () => {
       {/* Editorial Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <span className="text-xs font-bold uppercase tracking-wider text-rekind-terracotta">
-          Sharing Architecture
+          Industrial Circular Architecture
         </span>
         <h1 className="text-4xl sm:text-5xl font-heading font-extrabold text-rekind-dark tracking-tight">
-          Choose how to <span className="editorial-italic font-normal text-rekind-brown">share your item.</span>
+          Four circular pathways for <span className="editorial-italic font-normal text-rekind-brown">heavy machinery.</span>
         </h1>
         <p className="text-sm sm:text-base text-rekind-muted leading-relaxed">
-          REKIND is built to support flexible community circularity. Whether you want to give an item away for free, lend it for a semester, swap for something you need, or sell affordably — every path prevents landfill waste.
+          REKIND Industrial is built to eliminate idle capital across plants, yards, and construction fleets. Whether transferring surplus equipment at zero cost, leasing machinery for contracted projects, trading plant assets, or liquidating capital inventory — every transfer prevents scrap destruction and conserves industrial value.
         </p>
       </div>
 
       {/* The 4 Paths Comparison Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        {/* Method 1: Donate */}
+        {/* Method 1: Donate / Surplus Transfer */}
         <div className="bg-white rounded-2xl border border-rekind-border p-8 shadow-subtle hover:shadow-elevated transition-all flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -42,27 +42,27 @@ export const ShareGuide: React.FC = () => {
                 <Gift className="w-6 h-6" />
               </div>
               <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold">
-                Highest Community Impact
+                Highest ESG & Circular Impact
               </span>
             </div>
 
             <div>
-              <h2 className="text-2xl font-heading font-bold text-rekind-dark">1. Donate (Give for Free)</h2>
-              <p className="text-xs text-rekind-muted mt-1">Pass on items you will never use again with zero monetary barrier.</p>
+              <h2 className="text-2xl font-heading font-bold text-rekind-dark">1. Surplus Transfer (Free)</h2>
+              <p className="text-xs text-rekind-muted mt-1">Transfer decommissioned plant inventory, spare pumps, and tooling at zero equipment cost.</p>
             </div>
 
             <div className="space-y-2 text-xs text-rekind-dark">
               <p className="font-semibold text-rekind-brown">Best suited for:</p>
               <ul className="space-y-1.5 list-disc list-inside text-rekind-muted">
-                <li>Textbooks from finished courses</li>
-                <li>Gently used clothes, jackets, and shoes</li>
-                <li>Dorm lamps, kettles, and kitchen utensils</li>
-                <li>Study notebooks, stationery, and organizers</li>
+                <li>Decommissioned industrial pump stations & motors</li>
+                <li>Surplus hydraulic cylinders, hoses, and valves</li>
+                <li>Redundant plant tooling attachments & drill bits</li>
+                <li>Machinery spare parts inventory post line conversion</li>
               </ul>
             </div>
 
             <div className="p-3 bg-rekind-beige/40 rounded-xl border border-rekind-border text-xs text-rekind-brown">
-              ✨ <strong>Fastest turnaround:</strong> Free items typically get requested within 24 to 48 hours.
+              ✨ <strong>Plant Decommissioning:</strong> High corporate ESG credit; buyer covers certified rigging and transport.
             </div>
           </div>
 
@@ -70,11 +70,11 @@ export const ShareGuide: React.FC = () => {
             to="/post-item?method=donate"
             className="w-full py-3 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors text-center block"
           >
-            Start Free Donation Listing →
+            Start Surplus Transfer Listing →
           </Link>
         </div>
 
-        {/* Method 2: Lend */}
+        {/* Method 2: Lend / Industrial Lease */}
         <div className="bg-white rounded-2xl border border-rekind-border p-8 shadow-subtle hover:shadow-elevated transition-all flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -82,27 +82,27 @@ export const ShareGuide: React.FC = () => {
                 <Clock className="w-6 h-6" />
               </div>
               <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-bold">
-                Resource Circulation
+                Capital Fleet Utilization
               </span>
             </div>
 
             <div>
-              <h2 className="text-2xl font-heading font-bold text-rekind-dark">2. Lend (Temporary Borrow)</h2>
-              <p className="text-xs text-rekind-muted mt-1">Share an item temporarily for a semester, exam period, or weekend DIY task.</p>
+              <h2 className="text-2xl font-heading font-bold text-rekind-dark">2. Industrial Lease (Rental)</h2>
+              <p className="text-xs text-rekind-muted mt-1">Lease heavy machinery to contractors for monthly projects, scheduled overhauls, or peak seasons.</p>
             </div>
 
             <div className="space-y-2 text-xs text-rekind-dark">
               <p className="font-semibold text-rekind-brown">Best suited for:</p>
               <ul className="space-y-1.5 list-disc list-inside text-rekind-muted">
-                <li>Scientific & graphing calculators (TI-84, Casio)</li>
-                <li>Musical instruments for practice (guitars, keyboards)</li>
-                <li>Tools & hardware (drills, sanders, toolboxes)</li>
-                <li>Camping gear and sleeping bags</li>
+                <li>Crawler excavators & backhoes (Caterpillar, Komatsu)</li>
+                <li>Material handling forklifts & reach stackers</li>
+                <li>Industrial diesel generators (100 kVA - 1000 kVA)</li>
+                <li>Rotary screw air compressors (Atlas Copco, Ingersoll)</li>
               </ul>
             </div>
 
             <div className="p-3 bg-rekind-beige/40 rounded-xl border border-rekind-border text-xs text-rekind-brown">
-              ⏱️ <strong>Clear timelines:</strong> You specify expected return dates (e.g. "Up to 4 months for semester").
+              ⏱️ <strong>Operating meter tracking:</strong> Specify operating hour allowances (e.g. 200 hrs/month) and maintenance terms.
             </div>
           </div>
 
@@ -110,11 +110,11 @@ export const ShareGuide: React.FC = () => {
             to="/post-item?method=lend"
             className="w-full py-3 rounded-xl bg-rekind-espresso text-rekind-sand hover:bg-rekind-brown transition-colors text-center block"
           >
-            Start Lending Listing →
+            Start Industrial Lease Listing →
           </Link>
         </div>
 
-        {/* Method 3: Exchange */}
+        {/* Method 3: Exchange / Machine Trade-In */}
         <div className="bg-white rounded-2xl border border-rekind-border p-8 shadow-subtle hover:shadow-elevated transition-all flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -122,27 +122,27 @@ export const ShareGuide: React.FC = () => {
                 <Repeat className="w-6 h-6" />
               </div>
               <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold">
-                Direct Mutual Swap
+                Machinery Barter & Trade-In
               </span>
             </div>
 
             <div>
-              <h2 className="text-2xl font-heading font-bold text-rekind-dark">3. Exchange (Item Swap)</h2>
-              <p className="text-xs text-rekind-muted mt-1">Trade what you have for something you currently need with no money exchanged.</p>
+              <h2 className="text-2xl font-heading font-bold text-rekind-dark">3. Equipment Trade-In (Swap)</h2>
+              <p className="text-xs text-rekind-muted mt-1">Directly trade machinery assets you no longer utilize for equipment your plant currently requires.</p>
             </div>
 
             <div className="space-y-2 text-xs text-rekind-dark">
               <p className="font-semibold text-rekind-brown">Best suited for:</p>
               <ul className="space-y-1.5 list-disc list-inside text-rekind-muted">
-                <li>Novels, manga, and recreational book collections</li>
-                <li>Children's puzzles, board games, and Lego sets</li>
-                <li>Specialized hobby and crafting materials</li>
-                <li>Interchangeable sporting goods and racquets</li>
+                <li>CNC milling centers swapped for CNC lathes</li>
+                <li>Heavy forklift trucks exchanged for scissor lifts</li>
+                <li>Hydraulic press brakes traded for plate rollers</li>
+                <li>Surplus generator capacity swapped for plant compressors</li>
               </ul>
             </div>
 
             <div className="p-3 bg-rekind-beige/40 rounded-xl border border-rekind-border text-xs text-rekind-brown">
-              🤝 <strong>Custom proposals:</strong> Requesters propose what they have to swap before you accept.
+              🤝 <strong>Asset Rebalance:</strong> Modernize machine shops without liquid cash drawdowns.
             </div>
           </div>
 
@@ -150,11 +150,11 @@ export const ShareGuide: React.FC = () => {
             to="/post-item?method=exchange"
             className="w-full py-3 rounded-xl bg-rekind-brown text-white hover:bg-rekind-dark transition-colors text-center block"
           >
-            Start Item Swap Listing →
+            Start Equipment Swap Listing →
           </Link>
         </div>
 
-        {/* Method 4: Affordable Sale */}
+        {/* Method 4: Machinery Sale */}
         <div className="bg-white rounded-2xl border border-rekind-border p-8 shadow-subtle hover:shadow-elevated transition-all flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -162,27 +162,27 @@ export const ShareGuide: React.FC = () => {
                 <DollarSign className="w-6 h-6" />
               </div>
               <span className="px-3 py-1 rounded-full bg-orange-50 text-orange-900 text-xs font-bold">
-                Affordable Second-Hand
+                Direct Capital Sale
               </span>
             </div>
 
             <div>
-              <h2 className="text-2xl font-heading font-bold text-rekind-dark">4. Affordable Sale</h2>
-              <p className="text-xs text-rekind-muted mt-1">Set an accessible second-hand price to recover part of the item's purchase value.</p>
+              <h2 className="text-2xl font-heading font-bold text-rekind-dark">4. Machinery Sale</h2>
+              <p className="text-xs text-rekind-muted mt-1">Liquidate plant equipment at verified fair asset valuation with dual INR (₹) and USD ($) support.</p>
             </div>
 
             <div className="space-y-2 text-xs text-rekind-dark">
               <p className="font-semibold text-rekind-brown">Best suited for:</p>
               <ul className="space-y-1.5 list-disc list-inside text-rekind-muted">
-                <li>Laptops, monitors, and audio equipment</li>
-                <li>Solid wood furniture and ergonomic desk chairs</li>
-                <li>Higher-value technical reference handbooks</li>
-                <li>Premium waterproof outdoor gear</li>
+                <li>Production CNC machining centers (Haas, Mazak, Fanuc)</li>
+                <li>Hydraulic excavators, bulldozers & road rollers</li>
+                <li>Multi-megawatt diesel power generation packages</li>
+                <li>Plant production lines undergoing technology upgrades</li>
               </ul>
             </div>
 
             <div className="p-3 bg-rekind-beige/40 rounded-xl border border-rekind-border text-xs text-rekind-brown">
-              🏷️ <strong>Community ethos:</strong> Keep pricing fair and friendly compared to commercial retail.
+              🏷️ <strong>Global & Domestic:</strong> Quote tenders in Indian Rupees (₹) for domestic buyers or US Dollars ($) for cross-border export.
             </div>
           </div>
 
@@ -190,39 +190,39 @@ export const ShareGuide: React.FC = () => {
             to="/post-item?method=sell"
             className="w-full py-3 rounded-xl bg-[#9A634B] text-white hover:bg-rekind-dark transition-colors text-center block"
           >
-            Start Affordable Sale Listing →
+            Start Machinery Sale Listing →
           </Link>
         </div>
 
       </div>
 
-      {/* Safety & Community Verification Principles */}
+      {/* Safety & Heavy Machinery Verification Principles */}
       <div className="rounded-2xl bg-rekind-cream border border-rekind-border p-8 sm:p-10 space-y-6">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rekind-terracotta">
           <ShieldCheck className="w-4 h-4" />
-          <span>Trust & Verification</span>
+          <span>Industrial Handover & Rigging Protocols</span>
         </div>
         <h3 className="text-2xl font-heading font-bold text-rekind-dark">
-          The REKIND Handover Ethics
+          The REKIND Industrial Verification Standard
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-rekind-muted leading-relaxed">
           <div className="space-y-2">
-            <h4 className="font-bold text-sm text-rekind-dark">Daylight Public Locations</h4>
+            <h4 className="font-bold text-sm text-rekind-dark">On-Site Run Inspection</h4>
             <p>
-              We recommend meeting outside campus libraries, student commons, or neighborhood coffee shops. Never invite strangers to private residences alone.
+              Buyer engineers inspect hydraulic pressure, motor amperage, bearing temperatures, and maintenance logs in person prior to contract execution.
             </p>
           </div>
           <div className="space-y-2">
-            <h4 className="font-bold text-sm text-rekind-dark">Honest Condition Reporting</h4>
+            <h4 className="font-bold text-sm text-rekind-dark">Rigging & Transit Logistics</h4>
             <p>
-              Photograph any scuffs, dog-eared pages, or worn cables upfront. Surprises at handover damage community trust.
+              Heavy machinery requires certified crane lifting, counterweight staging, and lowbed multi-axle trailer transport with route clearances.
             </p>
           </div>
           <div className="space-y-2">
-            <h4 className="font-bold text-sm text-rekind-dark">Verify Transfer Completion</h4>
+            <h4 className="font-bold text-sm text-rekind-dark">Verified Transfer Ledger</h4>
             <p>
-              Once handed over, both parties can confirm the transfer in My Activity. This updates your trust score and logs real kilograms diverted in our impact ledger.
+              Upon machine commissioning, both organizations sign off in the REKIND portal, updating corporate trust scores and recording conserved tons of industrial machinery steel.
             </p>
           </div>
         </div>

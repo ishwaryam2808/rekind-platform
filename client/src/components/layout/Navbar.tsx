@@ -15,10 +15,13 @@ import {
   MessageSquare, 
   ChevronDown,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Wrench,
+  Cpu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { VoiceInputButton } from '../common/VoiceInputButton';
 
 export const Navbar: React.FC = () => {
   const { user, logout, unreadNotifsCount } = useAuth();
@@ -61,10 +64,10 @@ export const Navbar: React.FC = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Marketplace', path: '/marketplace' },
-    { name: 'Community Needs', path: '/community-needs' },
-    { name: 'How It Works', path: '/share' },
-    { name: 'Impact', path: '/impact' },
+    { name: 'Machinery Catalog', path: '/marketplace' },
+    { name: 'Equipment Demands', path: '/community-needs' },
+    { name: 'Sharing Models', path: '/share' },
+    { name: 'Asset Impact', path: '/impact' },
   ];
 
   const isActive = (path: string) => {
@@ -76,8 +79,8 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-50 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-rekind-border">
       {/* Top Banner */}
       <div className="bg-rekind-dark text-rekind-sand text-xs py-1.5 px-4 text-center tracking-wide font-medium flex items-center justify-center gap-2">
-        <Sparkles className="w-3.5 h-3.5 text-rekind-tan" />
-        <span>Less waste. More sharing. <span className="editorial-italic text-rekind-beige">Stronger communities.</span></span>
+        <Cpu className="w-3.5 h-3.5 text-amber-400" />
+        <span>Industrial Heavy Machinery & Plant Equipment Exchange. <span className="editorial-italic text-rekind-beige">Circulate capital assets.</span></span>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,17 +89,20 @@ export const Navbar: React.FC = () => {
           {/* Logo & Tagline */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-rekind-dark flex items-center justify-center shadow-subtle group-hover:bg-rekind-espresso transition-colors">
-              {/* Flame & Leaf Symbol */}
-              <svg className="w-6 h-6 text-rekind-tan" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C12 2 7 7 7 13C7 16.31 9.69 19 13 19C15.5 19 17.6 17.4 18.5 15.2C18.8 14.4 18 13.7 17.3 14.1C16.2 14.8 14.8 15.2 13.3 15.2C10.5 15.2 8.3 12.9 8.3 10.1C8.3 7.8 9.8 5.8 11.8 5C12.4 4.8 12.8 4.1 12.6 3.5C12.5 2.9 12.2 2 12 2Z" />
-              </svg>
+              {/* Heavy Machinery Cog & Flame Symbol */}
+              <Wrench className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <span className="font-heading font-extrabold text-2xl tracking-tight text-rekind-dark block leading-none">
-                REKIND
-              </span>
-              <span className="text-[11px] font-medium tracking-wider text-rekind-muted uppercase mt-0.5 block">
-                Give Things a Second Life
+              <div className="flex items-center gap-1.5">
+                <span className="font-heading font-extrabold text-2xl tracking-tight text-rekind-dark block leading-none">
+                  REKIND
+                </span>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded">
+                  Industrial
+                </span>
+              </div>
+              <span className="text-[10px] font-semibold tracking-wider text-rekind-muted uppercase mt-0.5 block">
+                Heavy Machinery & Equipment Exchange
               </span>
             </div>
           </Link>
@@ -261,13 +267,13 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {/* Prominent "Give an Item" CTA Button */}
+            {/* Prominent "List Machinery" CTA Button */}
             <Link
               to="/post-item"
               className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rekind-dark text-rekind-sand hover:bg-rekind-espresso hover:text-white transition-all text-xs sm:text-sm font-semibold shadow-subtle hover:shadow-elevated active:scale-98"
             >
-              <PlusCircle className="w-4 h-4 text-rekind-tan" />
-              <span>Give an Item</span>
+              <PlusCircle className="w-4 h-4 text-amber-400" />
+              <span>List Machinery</span>
             </Link>
 
             {/* Mobile Hamburger Button */}
@@ -281,7 +287,7 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Expandable Search Input Bar */}
+        {/* Expandable Search Input Bar with Voice Recognition */}
         {searchOpen && (
           <div className="py-3 px-2 border-t border-rekind-border/70 animate-in fade-in duration-150">
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
@@ -290,10 +296,24 @@ export const Navbar: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search textbooks, calculators, study desks, household essentials..."
-                className="w-full pl-10 pr-24 py-2.5 bg-white border border-rekind-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rekind-tan/60 focus:border-rekind-brown"
+                placeholder="Voice / Semantic Search: e.g. 'CAT 320 excavator', '5 ton forklift', 'Haas CNC mill', 'backup diesel power'..."
+                className="w-full pl-10 pr-32 py-2.5 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-700"
                 autoFocus
               />
+              
+              {/* Voice Search Button */}
+              <div className="absolute right-20 flex items-center">
+                <VoiceInputButton 
+                  size="sm"
+                  onTranscript={(transcript) => {
+                    setSearchQuery(transcript);
+                    navigate(`/marketplace?search=${encodeURIComponent(transcript.trim())}`);
+                    setSearchOpen(false);
+                  }}
+                  title="Speak machine specs, brand, or requirements"
+                />
+              </div>
+
               <button
                 type="submit"
                 className="absolute right-2 px-3 py-1.5 bg-rekind-dark text-rekind-sand text-xs font-semibold rounded-lg hover:bg-rekind-espresso transition-colors flex items-center gap-1"

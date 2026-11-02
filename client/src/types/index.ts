@@ -14,7 +14,13 @@ export interface User {
 }
 
 export type SharingType = 'donate' | 'lend' | 'exchange' | 'sell';
-export type ItemCondition = 'Like New' | 'Gently Used' | 'Good' | 'Fair' | 'Needs TLC';
+export type ItemCondition = 
+  | 'New / Unused Surplus'
+  | 'Excellent / Low Hours'
+  | 'Operational / Factory Serviced'
+  | 'Needs Reconditioning'
+  | 'Decommissioned / Salvage';
+
 export type ItemStatus = 'available' | 'reserved' | 'completed';
 
 export interface Item {
@@ -41,6 +47,16 @@ export interface Item {
   views: number;
   tags: string[];
   safetyNotes?: string;
+  // Industrial Machinery Specifications
+  manufacturer?: string;
+  modelNumber?: string;
+  operatingHours?: number;
+  tonnageCapacity?: string;
+  powerRating?: string;
+  yearOfManufacture?: number;
+  certification?: string;
+  serialNumber?: string;
+  matchedIntent?: string;
   createdAt: string;
   updatedAt: string;
   isFavorite?: boolean;
@@ -151,3 +167,17 @@ export interface ImpactMetrics {
   activeListings: number;
   activeNeeds: number;
 }
+
+export const INDUSTRIAL_CATEGORIES = [
+  'CNC & Metalworking Machinery',
+  'Earthmoving & Excavation Equipment',
+  'Material Handling & Forklifts',
+  'Generators & Industrial Power',
+  'Construction & Roadwork Machinery',
+  'Agricultural & Heavy Transport',
+  'Pumps, Compressors & Hydraulics',
+  'Industrial Tooling & Plant Surplus'
+] as const;
+
+export type IndustrialCategory = typeof INDUSTRIAL_CATEGORIES[number];
+

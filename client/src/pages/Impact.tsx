@@ -61,13 +61,13 @@ export const Impact: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Verifiable Database Audit Ledger</span>
+          <span>Verifiable Industrial Audit Ledger</span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-heading font-extrabold text-rekind-dark tracking-tight">
-          Transparent <span className="editorial-italic font-normal text-rekind-brown">Community Impact.</span>
+          Industrial Circular <span className="editorial-italic font-normal text-rekind-brown">Asset Impact.</span>
         </h1>
         <p className="text-sm sm:text-base text-rekind-muted leading-relaxed">
-          Every number below is calculated strictly from confirmed completed item handovers logged in the REKIND community ledger. No synthetic estimates, no fake claims.
+          Every figure is calculated strictly from confirmed completed heavy machinery handovers logged in the REKIND industrial ledger. Transparent circular asset redistribution across plants and yards.
         </p>
       </div>
 
@@ -77,42 +77,42 @@ export const Impact: React.FC = () => {
         {/* Metric 1 */}
         <div className="bg-white rounded-2xl border border-rekind-border p-6 shadow-subtle space-y-2">
           <div className="flex items-center justify-between text-rekind-muted">
-            <span className="text-xs font-bold uppercase tracking-wider">Circulated Items</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Circulated Machinery</span>
             <Package className="w-5 h-5 text-rekind-espresso" />
           </div>
           <span className="block text-4xl font-heading font-extrabold text-rekind-dark">
             {metrics ? metrics.totalTransfers : 0}
           </span>
           <p className="text-xs text-rekind-muted">
-            Textbooks, tools, calculators, and home essentials kept in active use.
+            Heavy plant machinery, CNC mills, forklifts, and compressors kept in productive operation.
           </p>
         </div>
 
         {/* Metric 2 */}
         <div className="bg-white rounded-2xl border border-rekind-border p-6 shadow-subtle space-y-2">
           <div className="flex items-center justify-between text-rekind-muted">
-            <span className="text-xs font-bold uppercase tracking-wider">Waste Diverted</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Steel Scrap Diverted</span>
             <Leaf className="w-5 h-5 text-rekind-terracotta" />
           </div>
           <span className="block text-4xl font-heading font-extrabold text-rekind-dark">
-            {metrics ? `${metrics.wasteDivertedKg} kg` : '0 kg'}
+            {metrics ? `${metrics.wasteDivertedKg >= 1000 ? `${(metrics.wasteDivertedKg / 1000).toFixed(1)} Tons` : `${metrics.wasteDivertedKg} kg`}` : '0 kg'}
           </span>
           <p className="text-xs text-rekind-muted">
-            Actual physical goods saved from municipal and campus dumpsters.
+            Fabricated steel, copper wiring, and machine castings saved from salvage shredding.
           </p>
         </div>
 
         {/* Metric 3 */}
         <div className="bg-white rounded-2xl border border-rekind-border p-6 shadow-subtle space-y-2">
           <div className="flex items-center justify-between text-rekind-muted">
-            <span className="text-xs font-bold uppercase tracking-wider">Community Savings</span>
+            <span className="text-xs font-bold uppercase tracking-wider">CAPEX Conserved</span>
             <span className="text-base font-bold text-emerald-700">{currencySymbol}</span>
           </div>
           <span className="block text-4xl font-heading font-extrabold text-rekind-dark">
             {metrics ? formatPrice(metrics.economicValueSaved) : formatPrice(0)}
           </span>
           <p className="text-xs text-rekind-muted">
-            Calculated replacement cost saved by local students and families.
+            Direct machinery replacement capital saved across contractor fleets and plants.
           </p>
         </div>
 

@@ -21,25 +21,17 @@ import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import type { SharingType, ItemCondition } from '../types';
+import { INDUSTRIAL_CATEGORIES } from '../types';
+import { VoiceInputButton } from '../components/common/VoiceInputButton';
 
-const CATEGORIES = [
-  'Books and Education',
-  'Electronics',
-  'Clothing and Accessories',
-  'Furniture and Home',
-  'Kitchen Essentials',
-  'Sports and Fitness',
-  'Toys and Games',
-  'Stationery',
-  'Other Reusable Items'
-];
+const CATEGORIES = INDUSTRIAL_CATEGORIES;
 
 const CONDITIONS: ItemCondition[] = [
-  'Like New',
-  'Gently Used',
-  'Good',
-  'Fair',
-  'Needs TLC'
+  'New / Unused Surplus',
+  'Excellent / Low Hours',
+  'Operational / Factory Serviced',
+  'Needs Reconditioning',
+  'Decommissioned / Salvage'
 ];
 
 export const PostItem: React.FC = () => {
@@ -54,21 +46,31 @@ export const PostItem: React.FC = () => {
   // Form Fields
   const [images, setImages] = useState<string[]>([]);
   const [title, setTitle] = useState<string>('');
-  const [category, setCategory] = useState<string>('Books and Education');
+  const [category, setCategory] = useState<string>('CNC & Metalworking Machinery');
   const [description, setDescription] = useState<string>('');
-  const [condition, setCondition] = useState<ItemCondition>('Gently Used');
+  const [condition, setCondition] = useState<ItemCondition>('Operational / Factory Serviced');
   const [quantity, setQuantity] = useState<number>(1);
   const [location, setLocation] = useState<string>(user?.location || '');
-  const [safetyNotes, setSafetyNotes] = useState<string>('Meet at campus library or daylight public spot.');
+  const [safetyNotes, setSafetyNotes] = useState<string>('Rigging and heavy crane transport required. Test run and motor inspection available on site.');
   const [tags, setTags] = useState<string>('');
+
+  // Heavy Machinery Specific Specs
+  const [manufacturer, setManufacturer] = useState<string>('');
+  const [modelNumber, setModelNumber] = useState<string>('');
+  const [operatingHours, setOperatingHours] = useState<number | ''>('');
+  const [tonnageCapacity, setTonnageCapacity] = useState<string>('');
+  const [powerRating, setPowerRating] = useState<string>('');
+  const [yearOfManufacture, setYearOfManufacture] = useState<number | ''>('');
+  const [certification, setCertification] = useState<string>('ISO 9001 / CE Certified');
+  const [serialNumber, setSerialNumber] = useState<string>('');
 
   // Sharing Method & Dynamic Fields
   const { currency: globalCurrency } = useCurrency();
   const initialMethod = (searchParams.get('method') as SharingType) || 'donate';
   const [type, setType] = useState<SharingType>(initialMethod);
   const [itemCurrency, setItemCurrency] = useState<'INR' | 'USD'>(globalCurrency);
-  const [price, setPrice] = useState<number>(globalCurrency === 'INR' ? 150 : 10);
-  const [lendingDuration, setLendingDuration] = useState<string>('');
+  const [price, setPrice] = useState<number>(globalCurrency === 'INR' ? 450000 : 8500);
+  const [lendingDuration, setLendingDuration] = useState<string>('3 Months');
   const [exchangePreferences, setExchangePreferences] = useState<string>('');
 
   // AI Assistant State
@@ -124,6 +126,13 @@ export const PostItem: React.FC = () => {
     if (aiSuggestion.description) setDescription(aiSuggestion.description);
     if (aiSuggestion.condition) setCondition(aiSuggestion.condition);
     if (aiSuggestion.tags) setTags(aiSuggestion.tags.join(', '));
+    if (aiSuggestion.manufacturer) setManufacturer(aiSuggestion.manufacturer);
+    if (aiSuggestion.modelNumber) setModelNumber(aiSuggestion.modelNumber);
+    if (aiSuggestion.operatingHours) setOperatingHours(aiSuggestion.operatingHours);
+    if (aiSuggestion.tonnageCapacity) setTonnageCapacity(aiSuggestion.tonnageCapacity);
+    if (aiSuggestion.powerRating) setPowerRating(aiSuggestion.powerRating);
+    if (aiSuggestion.yearOfManufacture) setYearOfManufacture(aiSuggestion.yearOfManufacture);
+    if (aiSuggestion.safetyNotes) setSafetyNotes(aiSuggestion.safetyNotes);
     if (aiSuggestion.recommendedSharingMethod) setType(aiSuggestion.recommendedSharingMethod);
     if (aiSuggestion.suggestedPrice && aiSuggestion.recommendedSharingMethod === 'sell') {
       setPrice(aiSuggestion.suggestedPrice);
@@ -139,7 +148,7 @@ export const PostItem: React.FC = () => {
     }
 
     if (!title.trim() || !description.trim()) {
-      alert('Please fill out the title and description.');
+      alert('Please fill out the machinery title and description.');
       return;
     }
 
@@ -159,7 +168,16 @@ export const PostItem: React.FC = () => {
         location,
         images,
         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
-        safetyNotes
+        safetyNotes,
+        // Heavy Machinery Spec Sheet
+        manufacturer: manufacturer.trim(),
+        modelNumber: modelNumber.trim(),
+        operatingHours: operatingHours !== '' ? Number(operatingHours) : undefined,
+        tonnageCapacity: tonnageCapacity.trim(),
+        powerRating: powerRating.trim(),
+        yearOfManufacture: yearOfManufacture !== '' ? Number(yearOfManufacture) : undefined,
+        certification: certification.trim(),
+        serialNumber: serialNumber.trim()
       };
 
       const res = await api.createItem(payload);
@@ -323,37 +341,160 @@ export const PostItem: React.FC = () => {
         </div>
       )}
 
-      {/* STEP 2: DESCRIBE THE ITEM */}
+      {/* STEP 2: DESCRIBE THE MACHINERY & SPECIFICATIONS */}
       {step === 2 && (
         <div className="bg-white rounded-2xl border border-rekind-border p-6 sm:p-8 space-y-6 shadow-subtle animate-in fade-in duration-200">
           <div>
             <h2 className="text-lg font-heading font-bold text-rekind-dark">
-              Step 2 — Describe the Item
+              Step 2 — Heavy Machinery Specifications & Operating Details
             </h2>
             <p className="text-xs text-rekind-muted mt-1">
-              Provide honest details so people know the condition, edition, or size.
+              Provide OEM specs, operating hours, and plant condition. You can type or use the voice microphone to dictate specs.
             </p>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                Item Title *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold text-rekind-dark">
+                  Machinery Title *
+                </label>
+                <VoiceInputButton
+                  onTranscript={(text) => setTitle(prev => prev ? `${prev} ${text}` : text)}
+                  size="sm"
+                  title="Speak machinery title"
+                />
+              </div>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Stewart Calculus: Early Transcendentals (8th Edition)"
+                placeholder="e.g. Caterpillar 320D Hydraulic Excavator"
                 className="w-full p-3 bg-white border border-rekind-border rounded-xl text-sm focus:ring-1 focus:ring-rekind-tan"
               />
+            </div>
+
+            {/* Industrial Machinery Specifications Strip */}
+            <div className="p-4 bg-rekind-cream/60 rounded-xl border border-rekind-border/70 space-y-3">
+              <span className="text-xs font-bold text-rekind-dark block uppercase tracking-wider">
+                Industrial OEM & Technical Specs
+              </span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Manufacturer / OEM
+                  </label>
+                  <input
+                    type="text"
+                    value={manufacturer}
+                    onChange={(e) => setManufacturer(e.target.value)}
+                    placeholder="e.g. Caterpillar, Haas, Komatsu"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Model Number
+                  </label>
+                  <input
+                    type="text"
+                    value={modelNumber}
+                    onChange={(e) => setModelNumber(e.target.value)}
+                    placeholder="e.g. 320D, VF-2, 8FGU25"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Operating Hours (hrs)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={operatingHours}
+                    onChange={(e) => setOperatingHours(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="e.g. 3450"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Year of Manufacture
+                  </label>
+                  <input
+                    type="number"
+                    min="1970"
+                    max="2030"
+                    value={yearOfManufacture}
+                    onChange={(e) => setYearOfManufacture(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="e.g. 2019"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Tonnage / Capacity
+                  </label>
+                  <input
+                    type="text"
+                    value={tonnageCapacity}
+                    onChange={(e) => setTonnageCapacity(e.target.value)}
+                    placeholder="e.g. 20 Tons, 5 Ton payload"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Power / HP / kVA
+                  </label>
+                  <input
+                    type="text"
+                    value={powerRating}
+                    onChange={(e) => setPowerRating(e.target.value)}
+                    placeholder="e.g. 148 HP, 125 kVA"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Serial Number / Chassis ID
+                  </label>
+                  <input
+                    type="text"
+                    value={serialNumber}
+                    onChange={(e) => setSerialNumber(e.target.value)}
+                    placeholder="e.g. CAT0320D-89472"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-rekind-dark mb-1">
+                    Compliance / Certification
+                  </label>
+                  <input
+                    type="text"
+                    value={certification}
+                    onChange={(e) => setCertification(e.target.value)}
+                    placeholder="e.g. CE Certified, OSHA, ISO 9001"
+                    className="w-full p-2 bg-white border border-rekind-border rounded-lg text-xs"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  Category *
+                  Machinery Category *
                 </label>
                 <select
                   value={category}
@@ -366,7 +507,7 @@ export const PostItem: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  Condition *
+                  Operating Condition *
                 </label>
                 <select
                   value={condition}
@@ -379,15 +520,22 @@ export const PostItem: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                Description & Notes *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold text-rekind-dark">
+                  Machine History & Operating Notes *
+                </label>
+                <VoiceInputButton
+                  onTranscript={(text) => setDescription(prev => prev ? `${prev} ${text}` : text)}
+                  size="sm"
+                  title="Speak machinery description"
+                />
+              </div>
               <textarea
                 rows={4}
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Detail what is included, any cosmetic wear, and why you are passing it on..."
+                placeholder="Include service history, overhaul status, tooling included, hydraulic condition, and reason for decommissioning..."
                 className="w-full p-3 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-rekind-tan"
               />
             </div>
@@ -395,26 +543,26 @@ export const PostItem: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  Pickup Location / Campus *
+                  Plant / Yard Location *
                 </label>
                 <input
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g. North Campus & Hostel C"
+                  placeholder="e.g. Pune Industrial Corridor, Plant Yard 4"
                   className="w-full p-2.5 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  Search Tags (comma separated)
+                  Search Keywords / Tags (comma separated)
                 </label>
                 <input
                   type="text"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  placeholder="calculus, textbook, stem, math"
+                  placeholder="excavator, crawler, hydraulic, cat, 20-ton"
                   className="w-full p-2.5 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm"
                 />
               </div>
@@ -422,13 +570,13 @@ export const PostItem: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                Safe Meetup Notes
+                Rigging, Transit & Safety Notes
               </label>
               <input
                 type="text"
                 value={safetyNotes}
                 onChange={(e) => setSafetyNotes(e.target.value)}
-                placeholder="e.g. Can meet outside Central Campus Library in daylight"
+                placeholder="e.g. Heavy crane rigging required. Buyer responsible for lowbed trailer transport."
                 className="w-full p-2.5 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm"
               />
             </div>
@@ -460,22 +608,22 @@ export const PostItem: React.FC = () => {
         </div>
       )}
 
-      {/* STEP 3: CHOOSE A SHARING METHOD */}
+      {/* STEP 3: CHOOSE A CIRCULAR SHARING MODALITY */}
       {step === 3 && (
         <div className="bg-white rounded-2xl border border-rekind-border p-6 sm:p-8 space-y-6 shadow-subtle animate-in fade-in duration-200">
           <div>
             <h2 className="text-lg font-heading font-bold text-rekind-dark">
-              Step 3 — Choose a Sharing Method
+              Step 3 — Industrial Sharing & Acquisition Modality
             </h2>
             <p className="text-xs text-rekind-muted mt-1">
-              REKIND prioritizes giving and community sharing, while also supporting affordable selling.
+              Select how this plant machinery or tooling asset should be transferred across industrial operations.
             </p>
           </div>
 
           {/* 4 Method Selectable Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
-            {/* Donate */}
+            {/* Donate / Surplus Transfer */}
             <div
               onClick={() => setType('donate')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all space-y-2 ${
@@ -490,13 +638,13 @@ export const PostItem: React.FC = () => {
                 </div>
                 {type === 'donate' && <Check className="w-5 h-5 text-rekind-dark font-bold" />}
               </div>
-              <h3 className="font-heading font-bold text-base text-rekind-dark">Donate (Free)</h3>
+              <h3 className="font-heading font-bold text-base text-rekind-dark">Surplus Transfer (Free)</h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Give the item away completely free. Highest community impact and fastest rehoming.
+                Decommissioned or surplus plant assets transferred at zero equipment cost. High ESG & recycling impact.
               </p>
             </div>
 
-            {/* Lend */}
+            {/* Lend / Industrial Lease */}
             <div
               onClick={() => setType('lend')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all space-y-2 ${
@@ -511,13 +659,13 @@ export const PostItem: React.FC = () => {
                 </div>
                 {type === 'lend' && <Check className="w-5 h-5 text-rekind-dark font-bold" />}
               </div>
-              <h3 className="font-heading font-bold text-base text-rekind-dark">Lend (Borrow)</h3>
+              <h3 className="font-heading font-bold text-base text-rekind-dark">Industrial Lease / Rental</h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Let someone borrow it for a defined period (e.g. calculator or textbook for the semester).
+                Lease heavy machinery to a nearby project or contractor for months or during downtime.
               </p>
             </div>
 
-            {/* Exchange */}
+            {/* Exchange / Machine Trade-In */}
             <div
               onClick={() => setType('exchange')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all space-y-2 ${
@@ -532,13 +680,13 @@ export const PostItem: React.FC = () => {
                 </div>
                 {type === 'exchange' && <Check className="w-5 h-5 text-rekind-dark font-bold" />}
               </div>
-              <h3 className="font-heading font-bold text-base text-rekind-dark">Exchange (Swap)</h3>
+              <h3 className="font-heading font-bold text-base text-rekind-dark">Equipment Trade-In / Swap</h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Swap this item for another useful item you currently need.
+                Swap this machine directly for industrial equipment, tooling attachments, or plant supplies you need.
               </p>
             </div>
 
-            {/* Sell */}
+            {/* Sell / Machinery Sale */}
             <div
               onClick={() => setType('sell')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all space-y-2 ${
@@ -553,9 +701,9 @@ export const PostItem: React.FC = () => {
                 </div>
                 {type === 'sell' && <Check className="w-5 h-5 text-rekind-dark font-bold" />}
               </div>
-              <h3 className="font-heading font-bold text-base text-rekind-dark">Affordable Sale</h3>
+              <h3 className="font-heading font-bold text-base text-rekind-dark">Machinery Sale</h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Set a modest, friendly second-hand price to recover part of the item's value.
+                Set a second-hand industrial price to liquidate capital machinery directly to industrial buyers.
               </p>
             </div>
 
@@ -565,20 +713,20 @@ export const PostItem: React.FC = () => {
           <div className="p-4 rounded-xl bg-rekind-cream border border-rekind-border/70 space-y-3">
             {type === 'donate' && (
               <p className="text-xs text-rekind-brown font-medium">
-                🎁 Listing as a free donation will mark the price as $0.00 and flag it on the "Available for Free" community showcase.
+                🏗️ Listing as a Surplus Transfer marks the capital cost as 0. Recipient arranges rigging and plant pickup.
               </p>
             )}
 
             {type === 'lend' && (
               <div>
                 <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  Expected Borrowing Duration *
+                  Expected Lease Duration / Terms *
                 </label>
                 <input
                   type="text"
                   value={lendingDuration}
                   onChange={(e) => setLendingDuration(e.target.value)}
-                  placeholder="e.g. 2 weeks, or until finals week in December"
+                  placeholder="e.g. 3 Months contract, 250 operating hours included"
                   className="w-full p-2.5 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm"
                 />
               </div>
@@ -587,13 +735,13 @@ export const PostItem: React.FC = () => {
             {type === 'exchange' && (
               <div>
                 <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  What kind of items are you looking to receive in swap? *
+                  Machinery or Tooling Desired in Exchange *
                 </label>
                 <input
                   type="text"
                   value={exchangePreferences}
                   onChange={(e) => setExchangePreferences(e.target.value)}
-                  placeholder="e.g. Engineering mathematics textbook, study stool, or chemistry lab kit"
+                  placeholder="e.g. 5-Ton overhead gantry crane, hydraulic press brake, or CAT backhoe"
                   className="w-full p-2.5 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm"
                 />
               </div>
@@ -610,7 +758,7 @@ export const PostItem: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setItemCurrency('INR');
-                        if (price === 10) setPrice(150);
+                        if (price === 8500) setPrice(450000);
                       }}
                       className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-semibold transition-all ${
                         itemCurrency === 'INR'
@@ -625,7 +773,7 @@ export const PostItem: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setItemCurrency('USD');
-                        if (price === 150) setPrice(10);
+                        if (price === 450000) setPrice(8500);
                       }}
                       className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-semibold transition-all ${
                         itemCurrency === 'USD'
@@ -641,7 +789,7 @@ export const PostItem: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                    Affordable Price ({itemCurrency === 'INR' ? '₹ INR' : '$ USD'}) *
+                    Machinery Valuation / Price ({itemCurrency === 'INR' ? '₹ INR' : '$ USD'}) *
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-xs font-bold text-rekind-muted">
@@ -650,17 +798,17 @@ export const PostItem: React.FC = () => {
                     <input
                       type="number"
                       min="1"
-                      max={itemCurrency === 'INR' ? 100000 : 2000}
+                      max={itemCurrency === 'INR' ? 500000000 : 10000000}
                       value={price}
                       onChange={(e) => setPrice(Number(e.target.value))}
-                      placeholder={itemCurrency === 'INR' ? 'e.g. 150' : 'e.g. 15'}
+                      placeholder={itemCurrency === 'INR' ? 'e.g. 850000' : 'e.g. 15000'}
                       className="w-full pl-8 pr-3 py-2 bg-white border border-rekind-border rounded-xl text-xs sm:text-sm font-semibold"
                     />
                   </div>
                   <p className="text-[11px] text-rekind-muted mt-1">
                     {itemCurrency === 'INR'
-                      ? 'Set a modest, friendly second-hand price in Indian Rupees (₹).'
-                      : 'Set a modest, friendly second-hand price in US Dollars ($).'}
+                      ? 'Set industrial machinery capital liquidation price in Indian Rupees (₹).'
+                      : 'Set industrial machinery capital liquidation price in US Dollars ($).'}
                   </p>
                 </div>
               </div>
@@ -837,16 +985,42 @@ export const PostItem: React.FC = () => {
               </div>
 
               <h3 className="font-heading font-bold text-sm text-rekind-dark line-clamp-2">
-                {title || 'Untitled Item'}
+                {title || 'Untitled Machinery'}
               </h3>
 
+              {/* Machinery Spec Badges */}
+              {(manufacturer || modelNumber || operatingHours !== '' || tonnageCapacity) && (
+                <div className="flex flex-wrap gap-1.5 py-1 text-[10px]">
+                  {manufacturer && (
+                    <span className="px-2 py-0.5 rounded bg-rekind-dark text-white font-medium">
+                      {manufacturer}
+                    </span>
+                  )}
+                  {modelNumber && (
+                    <span className="px-2 py-0.5 rounded bg-rekind-beige text-rekind-dark font-medium">
+                      Mod: {modelNumber}
+                    </span>
+                  )}
+                  {operatingHours !== '' && (
+                    <span className="px-2 py-0.5 rounded bg-rekind-sand/40 text-rekind-dark font-medium">
+                      {operatingHours.toLocaleString()} hrs
+                    </span>
+                  )}
+                  {tonnageCapacity && (
+                    <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-medium">
+                      {tonnageCapacity}
+                    </span>
+                  )}
+                </div>
+              )}
+
               <p className="text-xs text-rekind-muted line-clamp-2">
-                {description || 'No description provided.'}
+                {description || 'No operating description provided.'}
               </p>
 
               <div className="pt-2 border-t border-rekind-border text-[11px] text-rekind-dark font-medium flex justify-between">
                 <span>By {user?.name || 'You'}</span>
-                <span>Ready for pickup</span>
+                <span>Industrial Plant Inspection</span>
               </div>
             </div>
           </div>

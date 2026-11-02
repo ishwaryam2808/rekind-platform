@@ -17,19 +17,13 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import type { CommunityNeed, Item } from '../types';
+import { INDUSTRIAL_CATEGORIES } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { VoiceInputButton } from '../components/common/VoiceInputButton';
 
 const CATEGORIES = [
   'All',
-  'Books and Education',
-  'Electronics',
-  'Clothing and Accessories',
-  'Furniture and Home',
-  'Kitchen Essentials',
-  'Sports and Fitness',
-  'Toys and Games',
-  'Stationery',
-  'Other Reusable Items'
+  ...INDUSTRIAL_CATEGORIES
 ];
 
 const URGENCIES = ['All', 'Critical', 'High', 'Medium', 'Low'];
@@ -49,10 +43,10 @@ export const CommunityNeeds: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
   const [needTitle, setNeedTitle] = useState<string>('');
   const [needDescription, setNeedDescription] = useState<string>('');
-  const [needCategory, setNeedCategory] = useState<string>('Books and Education');
+  const [needCategory, setNeedCategory] = useState<string>('Earthmoving & Excavation Equipment');
   const [needQuantity, setNeedQuantity] = useState<number>(1);
-  const [needLocation, setNeedLocation] = useState<string>(user?.location || 'Central Campus Area');
-  const [needUrgency, setNeedUrgency] = useState<string>('Medium');
+  const [needLocation, setNeedLocation] = useState<string>(user?.location || 'Industrial Estate, Yard 2');
+  const [needUrgency, setNeedUrgency] = useState<string>('High');
   const [submittingNeed, setSubmittingNeed] = useState<boolean>(false);
 
   // Modal: Offer Item to Need
@@ -185,14 +179,14 @@ export const CommunityNeeds: React.FC = () => {
       <div className="bg-rekind-dark text-rekind-sand rounded-2xl p-6 sm:p-10 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="max-w-xl space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-rekind-tan">
-              Mutual Community Aid
+            <span className="text-xs font-bold uppercase tracking-wider text-rekind-tan flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-rekind-tan" /> Industrial Resource Matching
             </span>
             <h1 className="text-3xl sm:text-4xl font-heading font-extrabold text-white">
-              Community Needs Board
+              Machinery & Equipment Demands
             </h1>
             <p className="text-xs sm:text-sm text-rekind-sand/80 leading-relaxed">
-              Looking for a textbook, a graphing calculator for a semester, or a dorm study desk? Post what you need and neighbors or classmates will reach out to help.
+              Seeking a 50-Ton mobile crane, CNC horizontal lathe, or high-capacity diesel compressor? Post your equipment requirements and industrial peers across yards will connect to fulfill or lease.
             </p>
           </div>
 
@@ -207,26 +201,35 @@ export const CommunityNeeds: React.FC = () => {
             className="px-5 py-3 rounded-xl bg-rekind-tan text-rekind-dark hover:bg-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-subtle shrink-0 transition-colors"
           >
             <PlusCircle className="w-4 h-4 text-rekind-espresso" />
-            <span>Post an Item Request</span>
+            <span>Post Equipment Demand</span>
           </button>
         </div>
 
-        {/* Search Bar */}
+        {/* Voice & Keyword Search Bar */}
         <form onSubmit={handleSearchSubmit} className="relative max-w-2xl">
           <Search className="w-5 h-5 absolute left-4 top-3.5 text-rekind-muted" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search requested textbooks, tools, supplies, or locations..."
-            className="w-full pl-12 pr-28 py-3 bg-white text-rekind-dark rounded-xl text-sm placeholder:text-rekind-muted/70 focus:outline-none focus:ring-2 focus:ring-rekind-tan"
+            placeholder="Search requested machinery, OEM models, or plant locations..."
+            className="w-full pl-12 pr-32 py-3 bg-white text-rekind-dark rounded-xl text-sm placeholder:text-rekind-muted/70 focus:outline-none focus:ring-2 focus:ring-rekind-tan"
           />
-          <button
-            type="submit"
-            className="absolute right-2 top-2 px-4 py-1.5 rounded-lg bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors"
-          >
-            Search
-          </button>
+          <div className="absolute right-2 top-2 flex items-center gap-1.5">
+            <VoiceInputButton
+              onTranscript={(transcript) => {
+                setSearch(transcript);
+                updateParam('search', transcript);
+              }}
+              size="sm"
+            />
+            <button
+              type="submit"
+              className="px-4 py-1.5 rounded-lg bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors"
+            >
+              Search
+            </button>
+          </div>
         </form>
       </div>
 
@@ -406,22 +409,29 @@ export const CommunityNeeds: React.FC = () => {
 
             <form onSubmit={handleCreateNeed} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  What item do you need? *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-rekind-dark">
+                    What equipment or machinery do you need? *
+                  </label>
+                  <VoiceInputButton
+                    onTranscript={(spoken) => setNeedTitle(prev => prev ? `${prev} ${spoken}` : spoken)}
+                    size="sm"
+                    title="Speak machinery demand"
+                  />
+                </div>
                 <input
                   type="text"
                   required
                   value={needTitle}
                   onChange={(e) => setNeedTitle(e.target.value)}
-                  placeholder="e.g. Scientific Calculator (Casio fx-991EX or similar)"
+                  placeholder="e.g. 50-Ton Mobile Hydraulic Crane (Tadano / Terex)"
                   className="w-full p-2.5 bg-white border border-rekind-border rounded-xl text-xs focus:ring-1 focus:ring-rekind-tan"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-rekind-dark mb-1">Category *</label>
+                  <label className="block text-xs font-semibold text-rekind-dark mb-1">Machinery Category *</label>
                   <select
                     value={needCategory}
                     onChange={(e) => setNeedCategory(e.target.value)}
@@ -432,30 +442,37 @@ export const CommunityNeeds: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-rekind-dark mb-1">Urgency</label>
+                  <label className="block text-xs font-semibold text-rekind-dark mb-1">Demand Urgency</label>
                   <select
                     value={needUrgency}
                     onChange={(e) => setNeedUrgency(e.target.value)}
                     className="w-full p-2 bg-white border border-rekind-border rounded-xl text-xs"
                   >
-                    <option value="Critical">Critical (Needed ASAP)</option>
-                    <option value="High">High (Within few days)</option>
-                    <option value="Medium">Medium (Sometime this month)</option>
-                    <option value="Low">Low (Whenever someone has surplus)</option>
+                    <option value="Critical">Critical (Immediate Plant Stoppage)</option>
+                    <option value="High">High (Needed within 1-2 weeks)</option>
+                    <option value="Medium">Medium (Upcoming Project Phase)</option>
+                    <option value="Low">Low (Open for idle/surplus equipment)</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-rekind-dark mb-1">
-                  Why do you need this? *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-rekind-dark">
+                    Operating Specs & Job Site Context *
+                  </label>
+                  <VoiceInputButton
+                    onTranscript={(spoken) => setNeedDescription(prev => prev ? `${prev} ${spoken}` : spoken)}
+                    size="sm"
+                    title="Speak operating context"
+                  />
+                </div>
                 <textarea
                   required
                   rows={3}
                   value={needDescription}
                   onChange={(e) => setNeedDescription(e.target.value)}
-                  placeholder="Mention your coursework, project, or household reason. People love to help when they know the context!"
+                  placeholder="Detail job requirements, required boom length, electrical power (415V 3-phase), duration of work, and rigging accommodations..."
                   className="w-full p-2.5 bg-white border border-rekind-border rounded-xl text-xs focus:ring-1 focus:ring-rekind-tan"
                 />
               </div>

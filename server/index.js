@@ -222,6 +222,79 @@ app.put('/api/auth/password', authMiddleware, (req, res) => {
 });
 
 // -------------------------------------------------------------
+// INDUSTRIAL SEMANTIC INTENT MAPPINGS & SEARCH ENGINE
+// -------------------------------------------------------------
+const INDUSTRIAL_SEMANTIC_INTENTS = [
+  {
+    category: 'CNC & Metalworking Machinery',
+    intentKeywords: ['cut steel', 'metal cut', 'milling', 'lathe', 'turning', 'sheet metal', 'cnc', 'plasma', 'spindle', 'machining', 'laser cutter', 'press brake', 'drilling machine', 'metal shaping', 'bandsaw', 'punching'],
+    brands: ['haas', 'mazak', 'fanuc', 'dmg mori', 'doosan', 'makino', 'amada', 'trumpf', 'bridgeport', 'hardinge', 'okuma']
+  },
+  {
+    category: 'Earthmoving & Excavation Equipment',
+    intentKeywords: ['dig', 'trench', 'earthmoving', 'dirt', 'foundation', 'mining', 'excavation', 'backhoe', 'bucket', 'grading', 'crawler', 'heavy digging', 'quarry', 'demolition'],
+    brands: ['caterpillar', 'cat', 'komatsu', 'hitachi', 'volvo', 'jcb', 'hyundai', 'bobcat', 'sany', 'case', 'kobelco', 'doosan']
+  },
+  {
+    category: 'Material Handling & Forklifts',
+    intentKeywords: ['lift pallet', 'warehouse lift', 'stack cargo', 'pallet moving', 'heavy lifting', 'overhead crane', 'container lift', 'loading dock', 'forklift', 'reach truck', 'material handling', 'hoist', 'rigging'],
+    brands: ['toyota', 'hyster', 'crown', 'yale', 'linde', 'mitsubishi', 'genie', 'jlg', 'demag', 'konecranes', 'tcm']
+  },
+  {
+    category: 'Generators & Industrial Power',
+    intentKeywords: ['backup power', 'emergency power', 'generator', 'genset', 'blackout power', 'factory electricity', 'power plant', 'high voltage', 'off grid power', 'kva', 'prime power', 'substation'],
+    brands: ['cummins', 'caterpillar', 'cat', 'perkins', 'kirloskar', 'kohler', 'volvo penta', 'generac', 'stamford', 'leroy somer']
+  },
+  {
+    category: 'Construction & Roadwork Machinery',
+    intentKeywords: ['road paving', 'asphalt', 'compact soil', 'concrete pouring', 'highway construction', 'building construction', 'pavement', 'roller', 'compactor', 'mixer', 'batching'],
+    brands: ['bomag', 'wirtgen', 'dynapac', 'schwing stetter', 'putzmeister', 'hamm', 'vogele', 'caterpillar', 'ammann']
+  },
+  {
+    category: 'Agricultural & Heavy Transport',
+    intentKeywords: ['farm work', 'harvesting', 'plowing', 'heavy hauling', 'timber logging', 'tractor work', 'bulk transport', 'dump truck', 'lowbed', 'trailer', 'tipper'],
+    brands: ['john deere', 'massey ferguson', 'new holland', 'claas', 'tata', 'bharatbenz', 'scania', 'man', 'volvo trucks']
+  },
+  {
+    category: 'Pumps, Compressors & Hydraulics',
+    intentKeywords: ['compressed air', 'hydraulic pressure', 'water pump', 'slurry pumping', 'high pressure fluid', 'pneumatics', 'air supply', 'screw compressor', 'hydraulic power unit'],
+    brands: ['atlas copco', 'ingersoll rand', 'kaeser', 'parker', 'sullair', 'flowserve', 'grundfos', 'ksb', 'bosch rexroth']
+  },
+  {
+    category: 'Industrial Tooling & Plant Surplus',
+    intentKeywords: ['welding', 'pipe cutting', 'industrial maintenance', 'heavy torque', 'workshop tooling', 'plant decommissioning', 'factory surplus', 'magnetic drill', 'torque wrench'],
+    brands: ['lincoln electric', 'miller', 'esab', 'fronius', 'enerpac', 'hytorc', 'ridgid', 'bosch industrial', 'dewalt industrial']
+  }
+];
+
+function detectSemanticIntent(query) {
+  if (!query) return null;
+  const q = query.toLowerCase();
+
+  for (const item of INDUSTRIAL_SEMANTIC_INTENTS) {
+    for (const intent of item.intentKeywords) {
+      if (q.includes(intent)) {
+        return {
+          category: item.category,
+          matchedPhrase: intent,
+          reason: `Natural language query refers to "${intent}" (matches ${item.category})`
+        };
+      }
+    }
+    for (const brand of item.brands) {
+      if (q.includes(brand)) {
+        return {
+          category: item.category,
+          matchedPhrase: brand,
+          reason: `Manufacturer brand "${brand.toUpperCase()}" classified under ${item.category}`
+        };
+      }
+    }
+  }
+  return null;
+}
+
+// -------------------------------------------------------------
 // ITEMS & MARKETPLACE ROUTES
 // -------------------------------------------------------------
 
@@ -230,7 +303,7 @@ app.get('/api/items', optionalAuth, (req, res) => {
   const db = getDb();
   let items = [...db.items];
 
-  const { search, category, type, condition, location, status, sort, minPrice, maxPrice, page = 1, limit = 12 } = req.query;
+  const { search, category, type, condition, location, status, sort, minPrice, maxPrice, manufacturer, page = 1, limit = 12 } = req.query;
 
   // Filter by status (default to available + reserved, unless explicitly queried)
   if (status && status !== 'all') {
@@ -242,22 +315,27 @@ app.get('/api/items', optionalAuth, (req, res) => {
 
   // Filter by category
   if (category && category !== 'All' && category !== 'all') {
-    items = items.filter(i => i.category.toLowerCase() === category.toLowerCase());
+    items = items.filter(i => (i.category || '').toLowerCase() === category.toLowerCase());
+  }
+
+  // Filter by manufacturer
+  if (manufacturer && manufacturer !== 'All' && manufacturer !== 'all') {
+    items = items.filter(i => (i.manufacturer || '').toLowerCase().includes(manufacturer.toLowerCase()));
   }
 
   // Filter by sharing method
   if (type && type !== 'All' && type !== 'all') {
-    items = items.filter(i => i.type.toLowerCase() === type.toLowerCase());
+    items = items.filter(i => (i.type || '').toLowerCase() === type.toLowerCase());
   }
 
   // Filter by condition
   if (condition && condition !== 'All' && condition !== 'all') {
-    items = items.filter(i => i.condition.toLowerCase() === condition.toLowerCase());
+    items = items.filter(i => (i.condition || '').toLowerCase() === condition.toLowerCase());
   }
 
   // Filter by location
   if (location && location !== 'All' && location !== 'all') {
-    items = items.filter(i => i.location.toLowerCase().includes(location.toLowerCase()));
+    items = items.filter(i => (i.location || '').toLowerCase().includes(location.toLowerCase()));
   }
 
   // Filter by price range
@@ -268,26 +346,74 @@ app.get('/api/items', optionalAuth, (req, res) => {
     items = items.filter(i => Number(i.price) <= Number(maxPrice));
   }
 
-  // Search keyword in title, description, and tags
+  let semanticMatchInfo = null;
+
+  // HYBRID SEMANTIC & KEYWORD SEARCH ENGINE
   if (search && search.trim()) {
-    const q = search.trim().toLowerCase();
-    items = items.filter(i =>
-      i.title.toLowerCase().includes(q) ||
-      i.description.toLowerCase().includes(q) ||
-      (i.tags && i.tags.some(t => t.toLowerCase().includes(q))) ||
-      i.category.toLowerCase().includes(q)
-    );
+    const rawQuery = search.trim();
+    const q = rawQuery.toLowerCase();
+    const detectedIntent = detectSemanticIntent(q);
+
+    if (detectedIntent) {
+      semanticMatchInfo = detectedIntent;
+    }
+
+    const scoredItems = items.map(item => {
+      let score = 0;
+      const titleLower = (item.title || '').toLowerCase();
+      const descLower = (item.description || '').toLowerCase();
+      const catLower = (item.category || '').toLowerCase();
+      const mfrLower = (item.manufacturer || '').toLowerCase();
+      const modelLower = (item.modelNumber || '').toLowerCase();
+      const tagsList = Array.isArray(item.tags) ? item.tags.map(t => t.toLowerCase()) : [];
+      const specs = `${item.tonnageCapacity || ''} ${item.powerRating || ''} ${item.operatingHours || ''}`.toLowerCase();
+
+      // 1. Exact model or manufacturer match (Top weight)
+      if (modelLower && (modelLower.includes(q) || q.includes(modelLower))) score += 120;
+      if (mfrLower && (mfrLower.includes(q) || q.includes(mfrLower))) score += 90;
+
+      // 2. Exact Title match
+      if (titleLower.includes(q)) score += 60;
+
+      // 3. Semantic intent match (High weight)
+      if (detectedIntent && catLower === detectedIntent.category.toLowerCase()) {
+        score += 50;
+      }
+
+      // 4. Tokenized keyword matching
+      const tokens = q.split(/\s+/).filter(t => t.length > 1);
+      for (const token of tokens) {
+        if (titleLower.includes(token)) score += 25;
+        if (mfrLower.includes(token)) score += 25;
+        if (modelLower.includes(token)) score += 30;
+        if (specs.includes(token)) score += 20;
+        if (catLower.includes(token)) score += 15;
+        if (tagsList.some(tag => tag.includes(token))) score += 15;
+        if (descLower.includes(token)) score += 10;
+      }
+
+      return { item, score };
+    });
+
+    // Only keep items with a positive score when search is supplied
+    items = scoredItems
+      .filter(scored => scored.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(scored => ({
+        ...scored.item,
+        matchedIntent: detectedIntent ? detectedIntent.reason : undefined
+      }));
   }
 
-  // Sort
+  // Secondary Sort (if user explicitly chose price/views sort)
   if (sort === 'price_asc') {
     items.sort((a, b) => Number(a.price) - Number(b.price));
   } else if (sort === 'price_desc') {
     items.sort((a, b) => Number(b.price) - Number(a.price));
   } else if (sort === 'views') {
     items.sort((a, b) => (b.views || 0) - (a.views || 0));
-  } else {
-    // default: newest
+  } else if (!search) {
+    // default: newest if no search
     items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
@@ -313,7 +439,8 @@ app.get('/api/items', optionalAuth, (req, res) => {
     total,
     page: pageNum,
     totalPages: Math.ceil(total / limitNum),
-    hasMore: startIndex + limitNum < total
+    hasMore: startIndex + limitNum < total,
+    semanticMatch: semanticMatchInfo
   });
 });
 
@@ -384,7 +511,16 @@ app.post('/api/items', authMiddleware, (req, res) => {
     location,
     images,
     tags,
-    safetyNotes
+    safetyNotes,
+    // Industrial Heavy Machinery Fields
+    manufacturer,
+    modelNumber,
+    operatingHours,
+    tonnageCapacity,
+    powerRating,
+    yearOfManufacture,
+    certification,
+    serialNumber
   } = req.body;
 
   if (!title || !category || !description || !condition || !type) {
@@ -401,13 +537,13 @@ app.post('/api/items', authMiddleware, (req, res) => {
   const numericPrice = type === 'sell' ? (Number(price) || 0) : 0;
 
   if (!images || !Array.isArray(images) || images.length === 0) {
-    return res.status(400).json({ error: 'Please upload at least one photograph of the item.' });
+    return res.status(400).json({ error: 'Please upload at least one photograph of the machinery or plant equipment.' });
   }
 
   const validImages = images;
 
   const newItem = {
-    id: genId('item'),
+    id: genId('mach'),
     title: title.trim(),
     category,
     description: description.trim(),
@@ -421,6 +557,15 @@ app.post('/api/items', authMiddleware, (req, res) => {
     quantity: Number(quantity) || 1,
     location: location ? location.trim() : user.location,
     images: validImages,
+    // Heavy Machinery Specs
+    manufacturer: manufacturer ? String(manufacturer).trim() : '',
+    modelNumber: modelNumber ? String(modelNumber).trim() : '',
+    operatingHours: operatingHours !== undefined && operatingHours !== '' ? Number(operatingHours) : undefined,
+    tonnageCapacity: tonnageCapacity ? String(tonnageCapacity).trim() : '',
+    powerRating: powerRating ? String(powerRating).trim() : '',
+    yearOfManufacture: yearOfManufacture !== undefined && yearOfManufacture !== '' ? Number(yearOfManufacture) : undefined,
+    certification: certification ? String(certification).trim() : 'Factory Inspected',
+    serialNumber: serialNumber ? String(serialNumber).trim() : '',
     ownerId: user.id,
     ownerName: user.name,
     ownerAvatar: user.avatar,
@@ -429,7 +574,7 @@ app.post('/api/items', authMiddleware, (req, res) => {
     status: 'available',
     views: 1,
     tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : []),
-    safetyNotes: safetyNotes ? safetyNotes.trim() : 'Please inspect item during daytime in a comfortable public space.',
+    safetyNotes: safetyNotes ? safetyNotes.trim() : 'Certified rigging and transport required. On-site run inspection welcome prior to dispatch.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -437,7 +582,7 @@ app.post('/api/items', authMiddleware, (req, res) => {
   db.items.unshift(newItem);
   saveDb(db);
 
-  res.status(201).json({ item: newItem, message: 'Your listing is live!' });
+  res.status(201).json({ item: newItem, message: 'Your industrial machinery listing is live!' });
 });
 
 // Update Item
@@ -453,7 +598,13 @@ app.put('/api/items/:id', authMiddleware, (req, res) => {
     return res.status(403).json({ error: 'You can only edit your own listings.' });
   }
 
-  const fields = ['title', 'category', 'description', 'condition', 'type', 'price', 'currency', 'lendingDuration', 'exchangePreferences', 'quantity', 'location', 'images', 'status', 'safetyNotes', 'tags'];
+  const fields = [
+    'title', 'category', 'description', 'condition', 'type', 'price', 'currency', 
+    'lendingDuration', 'exchangePreferences', 'quantity', 'location', 'images', 
+    'status', 'safetyNotes', 'tags',
+    'manufacturer', 'modelNumber', 'operatingHours', 'tonnageCapacity', 'powerRating', 
+    'yearOfManufacture', 'certification', 'serialNumber'
+  ];
   fields.forEach(f => {
     if (req.body[f] !== undefined) {
       item[f] = req.body[f];
@@ -468,7 +619,7 @@ app.put('/api/items/:id', authMiddleware, (req, res) => {
   item.updatedAt = new Date().toISOString();
   saveDb(db);
 
-  res.json({ item, message: 'Item listing updated.' });
+  res.json({ item, message: 'Machinery listing updated.' });
 });
 
 // Delete Item
@@ -1199,7 +1350,7 @@ app.get('/api/impact', (req, res) => {
 });
 
 // -------------------------------------------------------------
-// AI-ASSISTED LISTING ENDPOINT
+// INDUSTRIAL AI-ASSISTED MACHINERY SPEC ENGINE
 // -------------------------------------------------------------
 
 app.post('/api/ai/suggest', (req, res) => {
@@ -1207,73 +1358,127 @@ app.post('/api/ai/suggest', (req, res) => {
 
   const hint = (titleHint || rawDescription || imageKeywords || '').toLowerCase();
 
-  // Smart heuristic & rule engine for realistic reuse suggestions
-  let suggestedCategory = 'Other Reusable Items';
-  let suggestedTitle = titleHint ? titleHint.trim() : 'Useful Reusable Item';
-  let suggestedDescription = 'Clean, functional, and ready for a second life with someone in the local community.';
-  let suggestedCondition = 'Gently Used';
-  let suggestedTags = ['reuse', 'community', 'sustainable'];
-  let suggestedSharingMethod = 'donate';
-  let suggestedPrice = 0;
+  // Default industrial baseline
+  let suggestedCategory = 'Industrial Tooling & Plant Surplus';
+  let suggestedTitle = titleHint ? titleHint.trim() : 'Industrial Plant Machinery & Surplus';
+  let suggestedDescription = 'Industrial equipment in verified operational state. Tested under load, complete maintenance documentation available, pre-dispatch factory inspection welcome.';
+  let suggestedCondition = 'Operational / Factory Serviced';
+  let suggestedTags = ['machinery', 'heavy-equipment', 'industrial', 'plant-surplus'];
+  let suggestedSharingMethod = 'sell';
+  let suggestedPrice = 250000;
+  let suggestedManufacturer = 'Industrial OEM';
+  let suggestedModel = 'Series Standard';
+  let suggestedOperatingHours = 2500;
+  let suggestedTonnage = 'N/A';
+  let suggestedPower = '415V 3-Phase';
+  let suggestedSafetyNotes = 'Industrial safety lockouts required during inspection. Rigging and transport must comply with regional heavy transit regulations.';
 
-  if (hint.includes('calculat') || hint.includes('ti-') || hint.includes('casio')) {
-    suggestedCategory = 'Electronics';
-    suggestedTitle = 'Texas Instruments Scientific / Graphing Calculator';
-    suggestedDescription = 'Fully tested screen and keys. Holds battery charge and comes with slide cover. Great for engineering, calculus, or statistics coursework.';
-    suggestedCondition = 'Good';
-    suggestedTags = ['calculator', 'stem', 'math', 'campus', 'electronics'];
-    suggestedSharingMethod = 'lend';
-  } else if (hint.includes('book') || hint.includes('textbook') || hint.includes('calculus') || hint.includes('physics') || hint.includes('chemistry') || hint.includes('edition')) {
-    suggestedCategory = 'Books and Education';
-    suggestedTitle = titleHint ? `${titleHint} (Clean Copy)` : 'Academic Course Textbook';
-    suggestedDescription = 'Clean pages with minimal margin notes. Binding is solid. Passing it on to help a fellow student save on book costs this semester.';
-    suggestedCondition = 'Gently Used';
-    suggestedTags = ['textbook', 'study', 'education', 'reading', 'course'];
-    suggestedSharingMethod = 'donate';
-  } else if (hint.includes('lamp') || hint.includes('light') || hint.includes('desk lamp')) {
-    suggestedCategory = 'Electronics';
-    suggestedTitle = 'Adjustable LED Desk Task Lamp';
-    suggestedDescription = 'Energy-efficient LED study lamp with multiple brightness and temperature modes. Steady base, no flickering, perfect for quiet work spaces.';
-    suggestedCondition = 'Like New';
-    suggestedTags = ['lamp', 'desk', 'lighting', 'study', 'dorm'];
-    suggestedSharingMethod = 'donate';
-  } else if (hint.includes('table') || hint.includes('desk') || hint.includes('chair') || hint.includes('shelf')) {
-    suggestedCategory = 'Furniture and Home';
-    suggestedTitle = titleHint ? titleHint : 'Solid Wood Study Desk / Small Table';
-    suggestedDescription = 'Sturdy build with minimal cosmetic surface wear. Fits nicely into a dorm room, studio apartment, or compact home workspace.';
-    suggestedCondition = 'Good';
-    suggestedTags = ['furniture', 'wood', 'desk', 'home', 'compact'];
-    suggestedSharingMethod = 'donate';
-  } else if (hint.includes('pot') || hint.includes('cooker') || hint.includes('pan') || hint.includes('kettle') || hint.includes('blender')) {
-    suggestedCategory = 'Kitchen Essentials';
-    suggestedTitle = titleHint ? titleHint : 'Electric Multi-Cooker / Kitchen Essential';
-    suggestedDescription = 'Thoroughly sanitized and tested. All functions operate smoothly. Great for easy healthy dorm cooking or small household meal prep.';
-    suggestedCondition = 'Gently Used';
-    suggestedTags = ['kitchen', 'cooking', 'appliance', 'dorm', 'mealprep'];
+  if (hint.includes('excavat') || hint.includes('cat') || hint.includes('caterpillar') || hint.includes('komatsu') || hint.includes('dig') || hint.includes('trench') || hint.includes('jcb') || hint.includes('dozer')) {
+    suggestedCategory = 'Earthmoving & Excavation Equipment';
+    suggestedTitle = titleHint ? titleHint : 'Caterpillar 320D Hydraulic Crawler Excavator (20 Ton)';
+    suggestedDescription = '20-ton crawler excavator with heavy-duty boom, standard trenching bucket, and auxiliary hydraulic lines. Undercarriage at 75% remaining life, clean hydraulic cylinders with zero seal weeping. Serviced by authorized technicians.';
+    suggestedCondition = 'Operational / Factory Serviced';
+    suggestedTags = ['excavator', 'caterpillar', 'earthmoving', 'heavy-equipment', '20-ton', 'mining', 'civil-works'];
+    suggestedSharingMethod = 'lend'; // Industrial Lease / Rental
+    suggestedManufacturer = 'Caterpillar';
+    suggestedModel = '320D L';
+    suggestedOperatingHours = 3800;
+    suggestedTonnage = '20 Ton';
+    suggestedPower = '148 HP / 110 kW';
+    suggestedPrice = 2800000;
+    suggestedSafetyNotes = 'Heavy haul lowbed trailer transport required. Pilot car and oversize transit permits required based on state highway guidelines.';
+  } else if (hint.includes('cnc') || hint.includes('mill') || hint.includes('lathe') || hint.includes('haas') || hint.includes('mazak') || hint.includes('fanuc') || hint.includes('turning') || hint.includes('machin') || hint.includes('laser')) {
+    suggestedCategory = 'CNC & Metalworking Machinery';
+    suggestedTitle = titleHint ? titleHint : 'Haas VF-2 High Precision 3-Axis Vertical Machining Center (VMC)';
+    suggestedDescription = 'Vertical CNC machining center featuring 30x16x20 inch travel, 10,000 RPM inline direct-drive spindle, 24+1 side-mount tool changer, and Renishaw wireless intuitive probing system. Kept in climate-controlled aerospace machine shop with complete calibration certificates.';
+    suggestedCondition = 'Excellent / Low Hours';
+    suggestedTags = ['cnc', 'vmc', 'haas', 'machining', 'milling', 'metalworking', 'precision-tooling'];
     suggestedSharingMethod = 'sell';
-    suggestedPrice = 20;
-  } else if (hint.includes('jacket') || hint.includes('coat') || hint.includes('hoodie') || hint.includes('sweater')) {
-    suggestedCategory = 'Clothing and Accessories';
-    suggestedTitle = titleHint ? titleHint : 'Warm Weatherproof Outerwear Jacket';
-    suggestedDescription = 'Clean, freshly laundered, with working zippers and tight seams. Breathable and comfortable for daily commuting or outdoor walks.';
-    suggestedCondition = 'Like New';
-    suggestedTags = ['clothing', 'outerwear', 'jacket', 'warm', 'unisex'];
+    suggestedManufacturer = 'Haas Automation';
+    suggestedModel = 'VF-2';
+    suggestedOperatingHours = 1950;
+    suggestedTonnage = '3.5 Ton (Machine Mass)';
+    suggestedPower = '30 HP / 22.4 kW (415V 3-Phase)';
+    suggestedPrice = 3200000;
+    suggestedSafetyNotes = 'Spindle bracket lock and axis transport blocks must be secured prior to air-ride flatbed transit.';
+  } else if (hint.includes('forklift') || hint.includes('lift') || hint.includes('toyota') || hint.includes('hyster') || hint.includes('crown') || hint.includes('pallet') || hint.includes('warehouse')) {
+    suggestedCategory = 'Material Handling & Forklifts';
+    suggestedTitle = titleHint ? titleHint : 'Toyota 8FGU25 2.5-Ton Industrial Pneumatic Forklift';
+    suggestedDescription = 'Dual-fuel (LPG / Petrol) counterbalanced warehouse forklift. Equipped with full free-lift 3-stage mast (189" lift height), cascade side-shifter, 48" forks, and solid puncture-proof pneumatic tires. Complete hydraulic test pass and fresh mast chain certification.';
+    suggestedCondition = 'Operational / Factory Serviced';
+    suggestedTags = ['forklift', 'toyota', 'material-handling', 'warehouse', '2.5-ton', 'lpg', 'lifting'];
+    suggestedSharingMethod = 'sell';
+    suggestedManufacturer = 'Toyota Material Handling';
+    suggestedModel = '8FGU25';
+    suggestedOperatingHours = 2400;
+    suggestedTonnage = '2.5 Ton (5,000 lbs)';
+    suggestedPower = 'Toyota 4Y-ECS Industrial Engine';
+    suggestedPrice = 1150000;
+    suggestedSafetyNotes = 'Equipped with beacon strobe, reverse audio horn, and certified operator rollover protective structure (ROPS).';
+  } else if (hint.includes('generator') || hint.includes('genset') || hint.includes('diesel') || hint.includes('cummins') || hint.includes('power') || hint.includes('kva') || hint.includes('kirloskar')) {
+    suggestedCategory = 'Generators & Industrial Power';
+    suggestedTitle = titleHint ? titleHint : 'Cummins 125 kVA Acoustic Enclosed Industrial Diesel Generator';
+    suggestedDescription = 'Heavy-duty prime industrial diesel generating set with sound-attenuated acoustic canopy (75 dBA at 1m). Powered by Cummins 6BTA5.9-G2 turbocharged diesel engine coupled with Stamford brushless alternator and DeepSea 7320 digital controller. Full load test report available.';
+    suggestedCondition = 'Operational / Factory Serviced';
+    suggestedTags = ['generator', 'diesel', 'cummins', '125kva', 'industrial-power', 'backup-power', 'genset'];
+    suggestedSharingMethod = 'lend'; // Industrial Lease
+    suggestedManufacturer = 'Cummins Power Generation';
+    suggestedModel = 'C125D5';
+    suggestedOperatingHours = 1450;
+    suggestedTonnage = '1.8 Ton';
+    suggestedPower = '125 kVA Prime / 100 kWe (415V 50Hz)';
+    suggestedPrice = 750000;
+    suggestedSafetyNotes = 'Automatic transfer switch (ATS) terminal must be isolated by certified electrical technician prior to transport.';
+  } else if (hint.includes('compressor') || hint.includes('pump') || hint.includes('atlas') || hint.includes('air') || hint.includes('hydraul')) {
+    suggestedCategory = 'Pumps, Compressors & Hydraulics';
+    suggestedTitle = titleHint ? titleHint : 'Atlas Copco GA 37 VSD Rotary Screw Air Compressor (50 HP)';
+    suggestedDescription = 'Variable Speed Drive (VSD) industrial rotary screw compressor with integrated refrigerant dryer and Elektronikon Touch control system. Delivers up to 215 CFM at 125 PSI with superior energy efficiency. Regularly serviced with genuine Atlas Copco Roto-Xtend fluid.';
+    suggestedCondition = 'Excellent / Low Hours';
+    suggestedTags = ['compressor', 'atlas-copco', 'screw-compressor', 'rotary', 'vsd', 'plant-air', 'hydraulics'];
+    suggestedSharingMethod = 'sell';
+    suggestedManufacturer = 'Atlas Copco';
+    suggestedModel = 'GA 37 VSD+';
+    suggestedOperatingHours = 3200;
+    suggestedTonnage = '1.1 Ton';
+    suggestedPower = '50 HP / 37 kW IE4 High Efficiency Motor';
+    suggestedPrice = 680000;
+    suggestedSafetyNotes = 'Internal air receiver pressure must be zeroed and condensate drain lines purged before shipping.';
+  } else if (hint.includes('roller') || hint.includes('asphalt') || hint.includes('pave') || hint.includes('compactor') || hint.includes('concrete')) {
+    suggestedCategory = 'Construction & Roadwork Machinery';
+    suggestedTitle = titleHint ? titleHint : 'Bomag BW 211 D-5 Single Drum Heavy Soil Compactor (11 Ton)';
+    suggestedDescription = '11-ton vibratory soil roller with smooth steel drum, hydrostatic all-wheel propulsion, and dual amplitude vibration system. High linear load for heavy civil earthfill and road foundation compaction. Clean operator platform with sun canopy and fresh service.';
+    suggestedCondition = 'Operational / Factory Serviced';
+    suggestedTags = ['roller', 'compactor', 'bomag', 'roadwork', 'construction', '11-ton', 'civil'];
+    suggestedSharingMethod = 'lend';
+    suggestedManufacturer = 'Bomag';
+    suggestedModel = 'BW 211 D-5';
+    suggestedOperatingHours = 2750;
+    suggestedTonnage = '11 Ton';
+    suggestedPower = 'Deutz 130 HP Turbo Diesel';
+    suggestedPrice = 2400000;
+    suggestedSafetyNotes = 'Articulated steering lock pin must be inserted prior to flatbed transport loading.';
+  } else if (hint.includes('weld') || hint.includes('lincoln') || hint.includes('miller') || hint.includes('tool') || hint.includes('torque')) {
+    suggestedCategory = 'Industrial Tooling & Plant Surplus';
+    suggestedTitle = titleHint ? titleHint : 'Miller Big Blue 400 Pro Heavy Duty Industrial Diesel Welder/Generator';
+    suggestedDescription = 'Heavy-duty pipeline and plant construction diesel welder. Delivers up to 400 Amps DC output for multi-process stick, MIG, TIG, and carbon arc gouging, plus 12 kW 3-phase auxiliary generator power. Fully tested with Perkins 404D industrial diesel engine.';
+    suggestedCondition = 'Operational / Factory Serviced';
+    suggestedTags = ['welder', 'miller', 'diesel-welder', 'industrial-tooling', '400-amp', 'pipeline', 'plant-surplus'];
     suggestedSharingMethod = 'exchange';
-  } else if (hint.includes('toy') || hint.includes('lego') || hint.includes('puzzle') || hint.includes('game')) {
-    suggestedCategory = 'Toys and Games';
-    suggestedTitle = titleHint ? titleHint : 'Educational Wooden Toy / Puzzle Set';
-    suggestedDescription = 'All pieces counted and packed cleanly. Inspires creative problem solving and hands-on play. Looking to pass on to an appreciative child or family.';
-    suggestedCondition = 'Like New';
-    suggestedTags = ['toys', 'kids', 'learning', 'puzzle', 'family'];
-    suggestedSharingMethod = 'exchange';
+    suggestedManufacturer = 'Miller Electric';
+    suggestedModel = 'Big Blue 400 Pro';
+    suggestedOperatingHours = 1800;
+    suggestedTonnage = '750 kg';
+    suggestedPower = '400A DC / Perkins 24.7 HP Diesel';
+    suggestedPrice = 450000;
+    suggestedSafetyNotes = 'Verify grounding cable integrity and engine oil levels before field welding operation.';
   }
 
-  // Find similar items currently on platform to display helpful matches
+  // Find similar machinery currently on platform to display helpful matches
   const db = getDb();
   const similarItems = db.items
     .filter(i => i.category === suggestedCategory && i.status === 'available')
     .slice(0, 3)
-    .map(i => ({ id: i.id, title: i.title, type: i.type, price: i.price }));
+    .map(i => ({ id: i.id, title: i.title, type: i.type, price: i.price, manufacturer: i.manufacturer, modelNumber: i.modelNumber }));
 
   res.json({
     suggestion: {
@@ -1284,6 +1489,12 @@ app.post('/api/ai/suggest', (req, res) => {
       tags: suggestedTags,
       recommendedSharingMethod: suggestedSharingMethod,
       suggestedPrice,
+      suggestedManufacturer,
+      suggestedModel,
+      suggestedOperatingHours,
+      suggestedTonnage,
+      suggestedPower,
+      suggestedSafetyNotes,
       similarItems
     }
   });

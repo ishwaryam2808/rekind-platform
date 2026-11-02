@@ -242,18 +242,18 @@ export const ItemDetail: React.FC = () => {
             </div>
           )}
 
-          {/* Safety & Reuse Guidelines Notice */}
+          {/* Safety & Heavy Machinery Logistics Notice */}
           <div className="p-4 rounded-xl bg-rekind-beige/50 border border-rekind-border/70 space-y-1.5 text-xs">
             <div className="flex items-center gap-2 font-bold text-rekind-dark">
               <ShieldCheck className="w-4 h-4 text-rekind-terracotta" />
-              <span>Community Trust & Safe Meetups</span>
+              <span>Industrial Safety & Machinery Rigging Protocols</span>
             </div>
             <p className="text-rekind-muted leading-relaxed">
-              Always meet in daylight at public spots like campus libraries, dining commons, or neighborhood coffee shops. Inspect the item together before confirming handover.
+              Heavy equipment handovers require certified crane rigging or lowbed trailer transport. Ensure on-site inspection, hydraulic leak checks, and motor test runs are completed prior to signing transfer documentation.
             </p>
             {item.safetyNotes && (
               <div className="pt-2 text-rekind-brown font-medium">
-                <strong>Owner Note:</strong> {item.safetyNotes}
+                <strong>Plant Logistics Note:</strong> {item.safetyNotes}
               </div>
             )}
           </div>
@@ -271,10 +271,10 @@ export const ItemDetail: React.FC = () => {
                 item.type === 'exchange' ? 'bg-rekind-brown text-white' :
                 'bg-rekind-terracotta text-white'
               }`}>
-                {item.type === 'donate' ? 'Free to Keep (Donation)' :
-                 item.type === 'lend' ? 'Available to Borrow (Lend)' :
-                 item.type === 'exchange' ? 'Open to Swap (Exchange)' :
-                 `${formatPrice(item.price, item.currency)} • Affordable Sale`}
+                {item.type === 'donate' ? 'Surplus Transfer (Free)' :
+                 item.type === 'lend' ? 'Industrial Lease / Rental' :
+                 item.type === 'exchange' ? 'Equipment Trade-In / Swap' :
+                 `${formatPrice(item.price, item.currency)} • Machinery Sale`}
               </span>
 
               <div className="flex items-center gap-2">
@@ -295,25 +295,85 @@ export const ItemDetail: React.FC = () => {
             {/* Price Banner */}
             <div className="text-xl font-heading font-bold text-rekind-dark">
               {item.type === 'sell' ? (
-                <span>{formatPrice(item.price, item.currency)} <span className="text-xs text-rekind-muted font-normal">affordable second-hand</span></span>
+                <span>{formatPrice(item.price, item.currency)} <span className="text-xs text-rekind-muted font-normal">equipment valuation</span></span>
               ) : (
-                <span className="text-rekind-brown">Free <span className="text-xs text-rekind-muted font-normal">({item.type} model)</span></span>
+                <span className="text-rekind-brown">No Capital Cost <span className="text-xs text-rekind-muted font-normal">({item.type} modality)</span></span>
               )}
             </div>
           </div>
 
+          {/* Heavy Machinery Technical Specifications Sheet */}
+          {(item.manufacturer || item.modelNumber || item.operatingHours !== undefined || item.tonnageCapacity || item.powerRating || item.yearOfManufacture || item.certification || item.serialNumber) && (
+            <div className="p-4 bg-rekind-cream/70 rounded-2xl border border-rekind-border space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-rekind-dark flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-rekind-terracotta" />
+                Technical Specifications Sheet
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {item.manufacturer && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">OEM Manufacturer</span>
+                    <span className="font-bold text-rekind-dark">{item.manufacturer}</span>
+                  </div>
+                )}
+                {item.modelNumber && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">Model Number</span>
+                    <span className="font-bold text-rekind-dark">{item.modelNumber}</span>
+                  </div>
+                )}
+                {item.operatingHours !== undefined && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">Operating Meter</span>
+                    <span className="font-bold text-rekind-dark">{Number(item.operatingHours).toLocaleString()} Hours</span>
+                  </div>
+                )}
+                {item.tonnageCapacity && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">Capacity / Tonnage</span>
+                    <span className="font-bold text-rekind-dark">{item.tonnageCapacity}</span>
+                  </div>
+                )}
+                {item.powerRating && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">Power / Output</span>
+                    <span className="font-bold text-rekind-dark">{item.powerRating}</span>
+                  </div>
+                )}
+                {item.yearOfManufacture && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">Year Built</span>
+                    <span className="font-bold text-rekind-dark">{item.yearOfManufacture}</span>
+                  </div>
+                )}
+                {item.certification && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">Compliance</span>
+                    <span className="font-bold text-rekind-dark">{item.certification}</span>
+                  </div>
+                )}
+                {item.serialNumber && (
+                  <div className="bg-white p-2 rounded-lg border border-rekind-border/60">
+                    <span className="text-rekind-muted block text-[10px] uppercase font-semibold">Chassis / Serial ID</span>
+                    <span className="font-bold text-rekind-dark font-mono text-[11px]">{item.serialNumber}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Quick Details Grid */}
           <div className="grid grid-cols-2 gap-3 py-4 border-y border-rekind-border/70 text-xs">
             <div>
-              <span className="text-rekind-muted block">Condition</span>
+              <span className="text-rekind-muted block">Operating Condition</span>
               <span className="font-semibold text-rekind-dark">{item.condition}</span>
             </div>
             <div>
-              <span className="text-rekind-muted block">Category</span>
+              <span className="text-rekind-muted block">Machinery Category</span>
               <span className="font-semibold text-rekind-dark">{item.category}</span>
             </div>
             <div>
-              <span className="text-rekind-muted block">Pickup Location</span>
+              <span className="text-rekind-muted block">Yard / Plant Location</span>
               <span className="font-semibold text-rekind-dark flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-rekind-muted" />
                 <span className="truncate">{item.location}</span>
@@ -453,10 +513,10 @@ export const ItemDetail: React.FC = () => {
                 >
                   <Sparkles className="w-4 h-4 text-rekind-tan" />
                   <span>
-                    {item.type === 'donate' ? 'Request This Item (Free)' :
-                     item.type === 'lend' ? 'Ask to Borrow' :
-                     item.type === 'exchange' ? 'Propose an Exchange' :
-                     'Offer to Purchase'}
+                    {item.type === 'donate' ? 'Request Surplus Transfer' :
+                     item.type === 'lend' ? 'Submit Industrial Lease Request' :
+                     item.type === 'exchange' ? 'Propose Machinery Trade-In' :
+                     'Initiate Acquisition / Inspection'}
                   </span>
                 </button>
 

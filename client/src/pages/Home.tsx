@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -15,19 +15,22 @@ import {
   Clock, 
   Heart,
   Package,
-  BookOpen,
-  Laptop,
-  Home as HomeIcon,
-  Shirt,
-  Compass
+  Wrench,
+  Cpu,
+  Truck,
+  Zap,
+  Mic
 } from 'lucide-react';
 import { api } from '../services/api';
 import type { Item, CommunityNeed, ImpactMetrics } from '../types';
 import { ItemCard } from '../components/common/ItemCard';
 import { useCurrency } from '../context/CurrencyContext';
+import { VoiceInputButton } from '../components/common/VoiceInputButton';
 
 export const Home: React.FC = () => {
+  const navigate = useNavigate();
   const { formatPrice } = useCurrency();
+  const [heroSearch, setHeroSearch] = useState<string>('');
   const [recentItems, setRecentItems] = useState<Item[]>([]);
   const [freeItems, setFreeItems] = useState<Item[]>([]);
   const [urgentNeeds, setUrgentNeeds] = useState<CommunityNeed[]>([]);
@@ -78,17 +81,71 @@ export const Home: React.FC = () => {
               
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rekind-beige border border-rekind-border text-xs font-semibold text-rekind-brown">
                 <span className="w-2 h-2 rounded-full bg-rekind-terracotta animate-pulse" />
-                Community Reuse & Resource Sharing
+                Heavy Machinery & Plant Asset Redistribution
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-rekind-dark tracking-tight leading-[1.1]">
-                Give things a <br />
-                <span className="editorial-italic font-normal text-rekind-brown">second life.</span>
+                Heavy machinery <br />
+                <span className="editorial-italic font-normal text-rekind-brown">circular exchange.</span>
               </h1>
 
               <p className="text-lg sm:text-xl text-rekind-muted max-w-xl font-normal leading-relaxed">
-                Pass on what you no longer need. Discover what someone else is looking for. Together, we make useful things go further.
+                Liquidate surplus plant machinery, lease earthmoving equipment, or trade CNC tooling across industrial operations. Search by voice command, OEM model numbers, or natural work intents.
               </p>
+
+              {/* Voice-Enabled Hero Search Bar */}
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (heroSearch.trim()) {
+                    navigate(`/marketplace?search=${encodeURIComponent(heroSearch.trim())}`);
+                  }
+                }}
+                className="relative max-w-xl"
+              >
+                <Search className="w-5 h-5 absolute left-4 top-3.5 text-rekind-muted" />
+                <input
+                  type="text"
+                  value={heroSearch}
+                  onChange={(e) => setHeroSearch(e.target.value)}
+                  placeholder="Voice or type OEM model (e.g. CAT 320, Haas VF-2, 5T Forklift)..."
+                  className="w-full pl-12 pr-32 py-3.5 bg-white text-rekind-dark rounded-2xl text-sm border border-rekind-border shadow-subtle focus:outline-none focus:ring-2 focus:ring-rekind-tan"
+                />
+                <div className="absolute right-2 top-2 flex items-center gap-1.5">
+                  <VoiceInputButton
+                    onTranscript={(transcript) => {
+                      setHeroSearch(transcript);
+                      navigate(`/marketplace?search=${encodeURIComponent(transcript)}`);
+                    }}
+                    size="sm"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-rekind-dark text-white text-xs font-semibold hover:bg-rekind-espresso transition-colors"
+                  >
+                    Search
+                  </button>
+                </div>
+              </form>
+
+              {/* Quick Industrial OEM / Spoken Query Jump Pills */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-rekind-muted font-medium flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-rekind-tan" /> Popular Queries:
+                </span>
+                <Link to="/marketplace?search=CAT%20320%20Excavator" className="px-2.5 py-1 rounded-md bg-white border border-rekind-border hover:border-rekind-tan text-rekind-dark transition-colors font-medium">
+                  🚜 CAT 320 Excavator
+                </Link>
+                <Link to="/marketplace?search=Haas%20CNC%20Mill" className="px-2.5 py-1 rounded-md bg-white border border-rekind-border hover:border-rekind-tan text-rekind-dark transition-colors font-medium">
+                  ⚙️ Haas CNC VMC
+                </Link>
+                <Link to="/marketplace?search=5%20Ton%20Forklift" className="px-2.5 py-1 rounded-md bg-white border border-rekind-border hover:border-rekind-tan text-rekind-dark transition-colors font-medium">
+                  🏗️ 5-Ton Forklift
+                </Link>
+                <Link to="/marketplace?type=donate" className="px-2.5 py-1 rounded-md bg-rekind-beige border border-rekind-border hover:border-rekind-brown text-rekind-brown font-semibold transition-colors">
+                  🎁 Plant Surplus (Free)
+                </Link>
+              </div>
 
               {/* CTAs */}
               <div className="pt-2 flex flex-wrap items-center gap-4">
@@ -96,7 +153,7 @@ export const Home: React.FC = () => {
                   to="/marketplace"
                   className="px-6 py-3.5 rounded-xl bg-rekind-dark text-rekind-sand hover:bg-rekind-espresso hover:text-white transition-all text-sm font-semibold shadow-subtle hover:shadow-elevated flex items-center gap-2 group active:scale-98"
                 >
-                  <span>Explore Items</span>
+                  <span>Explore Machinery Catalog</span>
                   <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                 </Link>
 
@@ -104,31 +161,14 @@ export const Home: React.FC = () => {
                   to="/post-item"
                   className="px-6 py-3.5 rounded-xl bg-white border border-rekind-border text-rekind-dark hover:border-rekind-brown hover:bg-rekind-cream transition-all text-sm font-semibold shadow-2xs active:scale-98"
                 >
-                  Share Something
+                  List Machinery or Surplus
                 </Link>
               </div>
 
               {/* Supporting Line */}
-              <div className="pt-4 flex items-center gap-3 text-xs text-rekind-brown font-medium">
+              <div className="pt-2 flex items-center gap-3 text-xs text-rekind-brown font-medium">
                 <Leaf className="w-4 h-4 text-rekind-terracotta shrink-0" />
-                <span>Less waste. More sharing. Stronger communities.</span>
-              </div>
-
-              {/* Quick Category Jump Pills */}
-              <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
-                <span className="text-rekind-muted font-medium">Popular:</span>
-                <Link to="/marketplace?category=Books%20and%20Education" className="px-2.5 py-1 rounded-md bg-white border border-rekind-border hover:border-rekind-tan text-rekind-dark transition-colors">
-                  📚 Textbooks
-                </Link>
-                <Link to="/marketplace?category=Electronics" className="px-2.5 py-1 rounded-md bg-white border border-rekind-border hover:border-rekind-tan text-rekind-dark transition-colors">
-                  ⚡ Calculators & Gadgets
-                </Link>
-                <Link to="/marketplace?category=Furniture%20and%20Home" className="px-2.5 py-1 rounded-md bg-white border border-rekind-border hover:border-rekind-tan text-rekind-dark transition-colors">
-                  🪑 Dorm & Home Desks
-                </Link>
-                <Link to="/marketplace?type=donate" className="px-2.5 py-1 rounded-md bg-rekind-beige border border-rekind-border hover:border-rekind-brown text-rekind-brown font-semibold transition-colors">
-                  🎁 Free Giveaways
-                </Link>
+                <span>Conserving heavy steel & industrial capital. Diverting industrial plant waste.</span>
               </div>
 
             </div>
@@ -137,49 +177,49 @@ export const Home: React.FC = () => {
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-md lg:max-w-none">
                 
-                {/* Main Large Editorial Photography Card */}
+                {/* Main Large Industrial Photography Card */}
                 <div className="relative rounded-2xl overflow-hidden shadow-float border border-rekind-border bg-rekind-sand/30 aspect-[4/5]">
                   <img
-                    src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1000&q=80"
-                    alt="Community items reuse"
+                    src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1000&q=80"
+                    alt="Heavy Excavation Machinery on site"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
                   
                   {/* Floating Tag on Main Photo */}
                   <div className="absolute bottom-6 left-6 right-6 text-white space-y-1.5">
                     <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-medium tracking-wide uppercase">
-                      Community Platform
+                      Industrial Exchange
                     </span>
                     <p className="font-heading font-bold text-lg leading-tight">
-                      Giving unused items a grateful second life with people who need them.
+                      Giving decommissioned and idle heavy machinery a productive second life across operations.
                     </p>
                   </div>
                 </div>
 
                 {/* Overlapping Floating Small Card 1 (Top Right) */}
-                <div className="absolute -top-4 -right-4 sm:-right-6 w-44 sm:w-48 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-rekind-border shadow-elevated hidden sm:block animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="absolute -top-4 -right-4 sm:-right-6 w-48 sm:w-52 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-rekind-border shadow-elevated hidden sm:block animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-xl bg-rekind-espresso text-rekind-sand flex items-center justify-center shrink-0">
                       <Repeat className="w-5 h-5 text-rekind-tan" />
                     </div>
                     <div className="overflow-hidden">
-                      <span className="text-[10px] font-bold text-rekind-terracotta uppercase">Circular Sharing</span>
-                      <p className="text-xs font-semibold text-rekind-dark truncate">Give, Lend & Swap</p>
-                      <p className="text-[10px] text-rekind-muted">Community circularity</p>
+                      <span className="text-[10px] font-bold text-rekind-terracotta uppercase">4 Circular Modalities</span>
+                      <p className="text-xs font-semibold text-rekind-dark truncate">Lease, Trade & Surplus</p>
+                      <p className="text-[10px] text-rekind-muted">Zero idle machinery</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Overlapping Floating Small Card 2 (Bottom Left) */}
-                <div className="absolute -bottom-6 -left-4 sm:-left-6 w-52 sm:w-56 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-rekind-border shadow-elevated hidden sm:block animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="absolute -bottom-6 -left-4 sm:-left-6 w-56 sm:w-60 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-rekind-border shadow-elevated hidden sm:block animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-rekind-beige flex items-center justify-center shrink-0 text-rekind-brown">
-                      <Sparkles className="w-5 h-5 text-rekind-terracotta" />
+                      <Mic className="w-5 h-5 text-rekind-terracotta" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-rekind-dark">AI-Assisted Listing</p>
-                      <p className="text-[11px] text-rekind-muted">Auto title, tags & fair advice</p>
+                      <p className="text-xs font-bold text-rekind-dark">Voice & Semantic Engine</p>
+                      <p className="text-[11px] text-rekind-muted">Speak OEM specs or task intent</p>
                     </div>
                   </div>
                 </div>
@@ -195,7 +235,7 @@ export const Home: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          {/* Card 1: Find Something */}
+          {/* Card 1: Find Machinery */}
           <Link
             to="/marketplace"
             className="group relative bg-white rounded-card p-6 border border-rekind-border hover:border-rekind-tan/80 transition-all duration-200 hover:shadow-elevated hover:-translate-y-1 flex flex-col justify-between"
@@ -205,19 +245,19 @@ export const Home: React.FC = () => {
                 <Search className="w-6 h-6" />
               </div>
               <h3 className="font-heading font-bold text-lg text-rekind-dark mb-1.5 flex items-center justify-between">
-                <span>Find Something</span>
+                <span>Find Machinery</span>
                 <ArrowRight className="w-4 h-4 text-rekind-tan group-hover:translate-x-1 transition-transform" />
               </h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Discover useful items available nearby, from study materials to dorm furniture.
+                Discover heavy plant machinery, CNC tooling, excavators, and industrial compressors across verified yards.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-rekind-border/50 text-[11px] font-semibold text-rekind-brown">
-              Browse Marketplace →
+              Browse Machinery Catalog →
             </div>
           </Link>
 
-          {/* Card 2: Give Something */}
+          {/* Card 2: Plant Surplus Transfer */}
           <Link
             to="/post-item?method=donate"
             className="group relative bg-white rounded-card p-6 border border-rekind-border hover:border-rekind-tan/80 transition-all duration-200 hover:shadow-elevated hover:-translate-y-1 flex flex-col justify-between"
@@ -227,19 +267,19 @@ export const Home: React.FC = () => {
                 <Gift className="w-6 h-6" />
               </div>
               <h3 className="font-heading font-bold text-lg text-rekind-dark mb-1.5 flex items-center justify-between">
-                <span>Give Something</span>
+                <span>Surplus Asset Transfer</span>
                 <ArrowRight className="w-4 h-4 text-rekind-tan group-hover:translate-x-1 transition-transform" />
               </h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Donate items to people who need them and give them a grateful second home.
+                Transfer decommissioned plant inventory, spare pumps, and tooling at zero capital equipment charge.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-rekind-border/50 text-[11px] font-semibold text-rekind-brown">
-              List a Free Item →
+              List Free Plant Surplus →
             </div>
           </Link>
 
-          {/* Card 3: Lend or Exchange */}
+          {/* Card 3: Machinery Lease & Trade-In */}
           <Link
             to="/share"
             className="group relative bg-white rounded-card p-6 border border-rekind-border hover:border-rekind-tan/80 transition-all duration-200 hover:shadow-elevated hover:-translate-y-1 flex flex-col justify-between"
@@ -249,19 +289,19 @@ export const Home: React.FC = () => {
                 <Repeat className="w-6 h-6" />
               </div>
               <h3 className="font-heading font-bold text-lg text-rekind-dark mb-1.5 flex items-center justify-between">
-                <span>Lend or Exchange</span>
+                <span>Lease & Trade-In</span>
                 <ArrowRight className="w-4 h-4 text-rekind-tan group-hover:translate-x-1 transition-transform" />
               </h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Share temporarily for a semester, or swap items with a neighbor.
+                Lease heavy machines for seasonal project contracts or trade idle plant assets for needed equipment.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-rekind-border/50 text-[11px] font-semibold text-rekind-brown">
-              Learn How to Share →
+              Industrial Sharing Modalities →
             </div>
           </Link>
 
-          {/* Card 4: Ask the Community */}
+          {/* Card 4: Equipment Demands */}
           <Link
             to="/community-needs"
             className="group relative bg-white rounded-card p-6 border border-rekind-border hover:border-rekind-tan/80 transition-all duration-200 hover:shadow-elevated hover:-translate-y-1 flex flex-col justify-between"
@@ -271,15 +311,15 @@ export const Home: React.FC = () => {
                 <HelpCircle className="w-6 h-6" />
               </div>
               <h3 className="font-heading font-bold text-lg text-rekind-dark mb-1.5 flex items-center justify-between">
-                <span>Ask the Community</span>
+                <span>Equipment Demands</span>
                 <ArrowRight className="w-4 h-4 text-rekind-tan group-hover:translate-x-1 transition-transform" />
               </h3>
               <p className="text-xs text-rekind-muted leading-relaxed">
-                Post an item request and connect with people who have surplus supplies.
+                Post high-capacity machinery demands (e.g. 50T mobile crane, CNC horizontal lathe) to industrial peers.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-rekind-border/50 text-[11px] font-semibold text-rekind-brown">
-              Community Needs Board →
+              Machinery Demands Board →
             </div>
           </Link>
 
@@ -466,18 +506,18 @@ export const Home: React.FC = () => {
         )}
       </section>
 
-      {/* 6. HOW REKIND WORKS IN THREE SIMPLE STEPS */}
+      {/* 6. HOW REKIND INDUSTRIAL WORKS IN THREE STEPS */}
       <section className="bg-rekind-dark text-rekind-sand py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-rekind-tan">
-              Simple & Thoughtful
+              Industrial Circular Economy
             </span>
             <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white">
-              How REKIND works in three simple steps
+              How REKIND Industrial works in three steps
             </h2>
             <p className="text-sm text-rekind-sand/80">
-              Pass on useful things quickly, safely, and with real measurable community impact.
+              Redistribute heavy plant machinery, CNC tooling, and earthmovers with transparent rigging logistics and measurable capital diversion.
             </p>
           </div>
 
@@ -489,10 +529,10 @@ export const Home: React.FC = () => {
                 1
               </div>
               <h3 className="font-heading font-bold text-xl text-white">
-                Snap & List with AI
+                Dictate & List with Voice AI
               </h3>
               <p className="text-xs sm:text-sm text-rekind-sand/70 leading-relaxed">
-                Take a quick photo of your unused textbook, calculator, or household item. Our AI assistant helps suggest category, title, description, and tags.
+                Dictate machine name and service history via live voice recognition. Our industrial AI assistant auto-extracts OEM manufacturers (CAT, Haas, Komatsu), operating hours, power ratings, and safety guidance.
               </p>
             </div>
 
@@ -502,10 +542,10 @@ export const Home: React.FC = () => {
                 2
               </div>
               <h3 className="font-heading font-bold text-xl text-white">
-                Choose How to Share
+                Choose Industrial Modality
               </h3>
               <p className="text-xs sm:text-sm text-rekind-sand/70 leading-relaxed">
-                Donate it completely free, lend it for the semester, propose a fair item swap, or sell at an affordable price. You stay in full control.
+                Offer as a plant surplus transfer (free), lease equipment for ongoing project timelines, propose a machine trade-in swap, or list for capital liquidation with dual ₹ INR / $ USD pricing.
               </p>
             </div>
 
@@ -515,10 +555,10 @@ export const Home: React.FC = () => {
                 3
               </div>
               <h3 className="font-heading font-bold text-xl text-white">
-                Handover & Divert Waste
+                Rigging, Inspection & ESG Metric
               </h3>
               <p className="text-xs sm:text-sm text-rekind-sand/70 leading-relaxed">
-                Meet safely at a campus library or community spot. Mark the transfer completed to record real diverted landfill weight in our verified ledger.
+                Coordinate on-site test runs and lowbed trailer rigging. Verified asset transfers log conserved metric tons of machinery steel into the transparent circular impact ledger.
               </p>
             </div>
 
@@ -529,7 +569,7 @@ export const Home: React.FC = () => {
               to="/share"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rekind-espresso text-rekind-cream hover:bg-rekind-brown text-xs sm:text-sm font-semibold transition-colors border border-rekind-brown/40"
             >
-              <span>Explore Sharing Guide & Methods</span>
+              <span>Explore Industrial Sharing Modalities</span>
               <ArrowRight className="w-4 h-4 text-rekind-tan" />
             </Link>
           </div>

@@ -41,23 +41,23 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onFavoriteToggle }) =>
     switch (type) {
       case 'donate':
         return {
-          label: 'Free to Keep',
-          bg: 'bg-rekind-dark text-white',
+          label: 'Surplus Transfer (Free)',
+          bg: 'bg-emerald-800 text-white',
         };
       case 'lend':
         return {
-          label: 'Available to Borrow',
-          bg: 'bg-rekind-espresso text-rekind-sand',
+          label: 'Industrial Lease / Rental',
+          bg: 'bg-blue-900 text-blue-100',
         };
       case 'exchange':
         return {
-          label: 'Open to Swap',
-          bg: 'bg-rekind-brown text-white',
+          label: 'Equipment Trade-In / Swap',
+          bg: 'bg-amber-900 text-amber-100',
         };
       case 'sell':
         return {
-          label: `${formatPrice(item.price, item.currency)} • Affordable`,
-          bg: 'bg-[#9A634B] text-white',
+          label: `${formatPrice(item.price, item.currency)} • Machinery Sale`,
+          bg: 'bg-stone-900 text-white',
         };
       default:
         return { label: type, bg: 'bg-rekind-dark text-white' };
@@ -142,6 +142,25 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onFavoriteToggle }) =>
               {item.title}
             </h3>
           </Link>
+
+          {/* Heavy Machine Specs Badge Strip */}
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            {(item.manufacturer || item.modelNumber) && (
+              <span className="text-[10px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                {item.manufacturer} {item.modelNumber}
+              </span>
+            )}
+            {item.operatingHours !== undefined && (
+              <span className="text-[10px] font-medium text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded">
+                ⚙️ {item.operatingHours.toLocaleString()} hrs
+              </span>
+            )}
+            {(item.tonnageCapacity || item.powerRating) && (
+              <span className="text-[10px] font-medium text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded">
+                ⚡ {item.tonnageCapacity || item.powerRating}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Bottom Metadata & Owner */}
